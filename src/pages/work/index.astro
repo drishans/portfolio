@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import PlateCard from '../../components/PlateCard.astro';
+import { getCollection } from 'astro:content';
+import { byOrder, pad } from '../../utils';
+
+const work = (await getCollection('work', ({ data }) => !data.draft)).sort(byOrder);
+---
+
+<Base title="Work — Drishan" description="Selected projects across quantum computing, AI systems, sound, and low-level engineering.">
+  <section class="section">
+    <div class="wrap">
+      <header class="top">
+        <p class="eyebrow">Selected Work</p>
+        <h1 class="top__title">Project plates</h1>
+        <p class="top__sub measure">
+          Each plate is a project worth a closer look; the problem, the approach,
+          and what came out the other side. {work.length} plates, newest first.
+        </p>
+      </header>
+
+      <div class="plates">
+        {work.map((p, i) => (
+          <PlateCard
+            plate={pad(i + 1)}
+            title={p.data.title}
+            summary={p.data.summary}
+            role={p.data.role}
+            year={p.data.year}
+            stack={p.data.stack}
+            glyph={p.data.glyph}
+            href={`/work/${p.id}/`}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { margin-bottom: var(--s-6); }
+  .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
+  .top__sub { margin-top: 1.1rem; color: var(--silver-dim); font-size: var(--step-0); line-height: 1.6; }
+
+  .plates { display: grid; grid-template-columns: 1fr; gap: var(--s-3); }
+  @media (min-width: 620px) { .plates { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .plates { grid-template-columns: repeat(3, 1fr); } }
+</style>

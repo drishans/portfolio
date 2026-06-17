@@ -1,0 +1,74 @@
+---
+import { SITE, SOCIAL } from '../consts';
+const year = new Date().getFullYear();
+const links = SOCIAL.filter((s) => s.href);
+---
+
+<footer class="ftr">
+  <div class="wrap">
+    <hr class="rule" />
+    <div class="ftr__grid">
+      <div class="ftr__col">
+        <p class="eyebrow">Colophon</p>
+        <p class="ftr__note">
+          Set in Fraunces, Newsreader and JetBrains&nbsp;Mono. Built with Astro and
+          shipped as static HTML. The field behind the title is a live shader, not a video.
+        </p>
+      </div>
+
+      <nav class="ftr__col ftr__links" aria-label="Contact">
+        <p class="eyebrow">Contact</p>
+        {links.map((s) => (
+          <a class="ftr__link" href={s.href} rel="me noopener" target={s.href.startsWith('http') ? '_blank' : undefined}>
+            <span class="ftr__arrow" aria-hidden="true">→</span>{s.label}
+          </a>
+        ))}
+      </nav>
+
+      <div class="ftr__col ftr__meta">
+        <p class="mono">© {year} {SITE.author}</p>
+        <a class="ftr__top mono" href="#top">↑ Top</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr { padding-block: var(--s-6) var(--s-5); position: relative; z-index: 2; }
+  .ftr__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: var(--s-5);
+    margin-top: var(--s-5);
+    align-items: start;
+  }
+  .ftr__col { display: flex; flex-direction: column; gap: 0.9rem; }
+  .ftr__note {
+    max-width: 42ch;
+    color: var(--silver-dim);
+    font-size: var(--step--1);
+    line-height: 1.6;
+  }
+  .ftr__links { gap: 0.55rem; }
+  .ftr__link {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.04em;
+    color: var(--silver-dim);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    transition: color 0.2s var(--ease);
+  }
+  .ftr__link:hover { color: var(--signal); }
+  .ftr__arrow { color: var(--mid); }
+  .ftr__link:hover .ftr__arrow { color: var(--signal); }
+  .ftr__meta { align-items: flex-end; gap: 0.6rem; }
+  .ftr__top { color: var(--silver-dim); transition: color 0.2s var(--ease); }
+  .ftr__top:hover { color: var(--signal); }
+
+  @media (max-width: 720px) {
+    .ftr__grid { grid-template-columns: 1fr; gap: var(--s-4); }
+    .ftr__meta { align-items: flex-start; }
+  }
+</style>

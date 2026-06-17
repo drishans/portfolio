@@ -1,0 +1,91 @@
+---
+import Base from './Base.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'writing'>;
+  minutes: number;
+  prev?: { title: string; href: string } | null;
+  next?: { title: string; href: string } | null;
+}
+const { entry, minutes, prev, next } = Astro.props;
+const d = entry.data;
+const stamp = d.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const iso = d.pubDate.toISOString();
+const updated = d.updatedDate?.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<Base title={`${d.title} — Writing`} description={d.description} type="article">
+  <article class="section">
+    <div class="wrap">
+      <a href="/writing/" class="back mono">← All field notes</a>
+
+      <header class="head measure">
+        <p class="head__line mono">
+          <time datetime={iso}>{stamp}</time>
+          <span class="head__sep">/</span>
+          <span>{minutes} min read</span>
+          {d.tags.length > 0 && <><span class="head__sep">/</span><span>{d.tags.join(' · ')}</span></>}
+        </p>
+        <h1 class="head__title">{d.title}</h1>
+        <p class="head__desc">{d.description}</p>
+        {updated && <p class="head__upd mono">Updated {updated}</p>}
+      </header>
+
+      <hr class="rule head__rule" />
+
+      <div class="prose body">
+        <slot />
+      </div>
+
+      <nav class="pn" aria-label="More writing">
+        {prev ? (
+          <a class="pn__item" href={prev.href}>
+            <span class="mono">← Previous</span>
+            <span class="pn__title">{prev.title}</span>
+          </a>
+        ) : <span></span>}
+        {next ? (
+          <a class="pn__item pn__item--next" href={next.href}>
+            <span class="mono">Next →</span>
+            <span class="pn__title">{next.title}</span>
+          </a>
+        ) : <span></span>}
+      </nav>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .back { display: inline-block; color: var(--silver-dim); margin-bottom: var(--s-5); transition: color 0.2s var(--ease); }
+  .back:hover { color: var(--signal); }
+
+  .head { margin-inline: auto; max-width: var(--measure); }
+  .head__line { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+  .head__sep { color: var(--hair-bright); }
+  .head__title { font-size: var(--step-4); margin-top: 1rem; }
+  .head__desc { margin-top: 1rem; font-size: var(--step-1); color: var(--silver-dim); line-height: 1.5; font-style: italic; }
+  .head__upd { margin-top: 0.8rem; color: var(--mid); }
+  .head__rule { max-width: var(--measure); margin: var(--s-5) auto; }
+
+  .body { margin-inline: auto; }
+
+  .pn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-4);
+    max-width: var(--measure);
+    margin: var(--s-7) auto 0;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--hair);
+  }
+  .pn__item { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.1rem; border: 1px solid var(--hair); border-radius: var(--radius); transition: border-color 0.2s var(--ease); }
+  .pn__item:hover { border-color: var(--hair-bright); }
+  .pn__item--next { text-align: right; align-items: flex-end; }
+  .pn__title { font-family: var(--display); font-variation-settings: 'opsz' 36, 'wght' 520, 'SOFT' 0, 'WONK' 0; font-size: var(--step-0); color: var(--silver); }
+
+  @media (max-width: 720px) {
+    .pn { grid-template-columns: 1fr; }
+    .pn__item--next { text-align: left; align-items: flex-start; }
+  }
+</style>

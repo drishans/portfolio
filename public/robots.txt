@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://drishan.com/sitemap-index.xml

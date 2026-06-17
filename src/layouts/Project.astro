@@ -1,0 +1,100 @@
+---
+import Base from './Base.astro';
+import Readout from '../components/Readout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+  prev?: { title: string; href: string } | null;
+  next?: { title: string; href: string } | null;
+}
+const { entry, prev, next } = Astro.props;
+const d = entry.data;
+
+const rows = [
+  { k: 'Role', v: d.role },
+  ...(d.length ? [{ k: 'Length', v: d.length }] : []),
+  { k: 'Year', v: String(d.year) },
+  ...(d.stack.length ? [{ k: 'Stack', v: d.stack.join(', ') }] : []),
+];
+---
+
+<Base title={`${d.title} — Work`} description={d.summary} type="article">
+  <article class="section">
+    <div class="wrap">
+      <a href="/work/" class="back mono">← All plates</a>
+
+      <header class="lede">
+        <p class="eyebrow">Selected Work</p>
+        <h1 class="lede__title">{d.title}</h1>
+        <p class="lede__summary measure">{d.summary}</p>
+      </header>
+
+      <div class="grid">
+        <aside class="grid__meta">
+          <Readout rows={rows} />
+          {(d.repo || d.live) && (
+            <div class="links">
+              {d.repo && <a class="link mono" href={d.repo} target="_blank" rel="noopener">Repository →</a>}
+              {d.live && <a class="link mono" href={d.live} target="_blank" rel="noopener">Live →</a>}
+            </div>
+          )}
+        </aside>
+
+        <div class="grid__body prose">
+          <slot />
+        </div>
+      </div>
+
+      <nav class="pn" aria-label="More work">
+        {prev ? (
+          <a class="pn__item pn__item--prev" href={prev.href}>
+            <span class="mono">← Prev plate</span>
+            <span class="pn__title">{prev.title}</span>
+          </a>
+        ) : <span></span>}
+        {next ? (
+          <a class="pn__item pn__item--next" href={next.href}>
+            <span class="mono">Next plate →</span>
+            <span class="pn__title">{next.title}</span>
+          </a>
+        ) : <span></span>}
+      </nav>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .back { display: inline-block; color: var(--silver-dim); margin-bottom: var(--s-5); transition: color 0.2s var(--ease); }
+  .back:hover { color: var(--signal); }
+
+  .lede { margin-bottom: var(--s-6); }
+  .lede__title { font-size: var(--step-4); margin-top: 0.4rem; }
+  .lede__summary { margin-top: 1.1rem; font-size: var(--step-1); color: var(--silver-dim); line-height: 1.5; }
+
+  .grid { display: grid; grid-template-columns: 18rem 1fr; gap: var(--s-6); align-items: start; }
+  .grid__meta { position: sticky; top: 84px; }
+  .links { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.2rem; }
+  .links .link { color: var(--silver-dim); }
+  .links .link:hover { color: var(--signal); }
+
+  .pn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-4);
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--hair);
+  }
+  .pn__item { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.2rem; border: 1px solid var(--hair); border-radius: var(--radius); transition: border-color 0.2s var(--ease); }
+  .pn__item:hover { border-color: var(--hair-bright); }
+  .pn__item--next { text-align: right; align-items: flex-end; }
+  .pn__title { font-family: var(--display); font-variation-settings: 'opsz' 40, 'wght' 520, 'SOFT' 0, 'WONK' 0; font-size: var(--step-1); color: var(--silver); }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; gap: var(--s-5); }
+    .grid__meta { position: static; }
+    .pn { grid-template-columns: 1fr; }
+    .pn__item--next { text-align: left; align-items: flex-start; }
+  }
+</style>

@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="No signal — Drishan" description="That page isn't on this frequency.">
+  <section class="nf">
+    <div class="wrap nf__inner">
+      <p class="eyebrow">Error 404</p>
+      <h1 class="nf__code">404</h1>
+      <p class="nf__msg">No signal on this frequency. The page isn't here.</p>
+      <div class="nf__links">
+        <a href="/" class="link mono">Home →</a>
+        <a href="/work/" class="link mono">Work →</a>
+        <a href="/writing/" class="link mono">Writing →</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { min-height: 70svh; display: flex; align-items: center; }
+  .nf__inner { text-align: center; }
+  .nf__code {
+    font-size: clamp(5rem, 18vw, 12rem);
+    font-variation-settings: 'opsz' 144, 'wght' 600, 'SOFT' 0, 'WONK' 0;
+    line-height: 1;
+    color: var(--silver);
+    margin-block: 0.4rem;
+  }
+  .nf__msg { color: var(--silver-dim); font-size: var(--step-1); font-style: italic; }
+  .nf__links { display: flex; gap: 1.6rem; justify-content: center; margin-top: 1.8rem; }
+  .nf__links .link { color: var(--silver-dim); }
+  .nf__links .link:hover { color: var(--signal); }
+</style>

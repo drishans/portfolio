@@ -1,0 +1,165 @@
+---
+import Base from '../layouts/Base.astro';
+import Glyph from '../components/Glyph.astro';
+import { SITE } from '../consts';
+
+const tracks = [
+  {
+    glyph: 'polar' as const,
+    name: 'Quantum',
+    body: 'Error characterization, simulation, and data-acquisition tooling for superconducting-qubit systems.',
+  },
+  {
+    glyph: 'spectrum' as const,
+    name: 'AI Systems',
+    body: 'Retrieval pipelines, agent architectures, and the production plumbing that keeps them in check.',
+  },
+  {
+    glyph: 'waveform' as const,
+    name: 'Sound & Signal',
+    body: 'Experimental bass, real-time DSP, and generative visuals - Rust, WebGL, and a lot of late nights.',
+  },
+];
+
+const toolkit = [
+  'Python', 'TypeScript', 'Julia', 'Qiskit', 'cuQuantum', 'CUDA', 'Rust', 'Max/MSP',
+  'Vertex AI', 'LangGraph', 'WebAssembly', 'OpenGL', 'Resolume', 'Real-time DSP',
+];
+
+const currently = [
+  'Building deployment + orchestration software as an early engineer at a Bay Area startup.',
+  'Exploring quantum error characterization on the GPU with cuQuantum.',
+  'Making experimental bass musicand the occasional generative visual after hours.',
+];
+---
+
+<Base title="About Me" description="Engineer across quantum computing, AI systems, and sound — and the thread that connects them.">
+  <section class="section">
+    <div class="wrap">
+      <header class="top">
+        <p class="eyebrow">About</p>
+        <h1 class="top__title">Behind the lens</h1>
+      </header>
+
+      <div class="lead prose measure">
+        <p>
+          Hi, I'm {SITE.author}; a software engineer who works across quantum computing,
+          AI/ML systems, and the low-level layer that ties them together. I studied CS
+          at CU Boulder through a master's with a numerical computing focus, where I
+          helped build tooling for quantum experiments at NIST. I worked as an AI engineer
+          at a small cybersecurity company after college. I'm currently a founding engineer
+          at a Bay Area startup building deployment and orchestration software.
+        </p>
+        <p>
+          The constant is a pull toward problems where the abstraction is thin and
+          the details decide everything: characterizing error on real hardware,
+          retrieval that holds up at scale, signal code that has to hit a deadline.
+          That same instinct runs off the clock, where I make experimental bass music
+          and build generative visuals. The look of this site borrows from the
+          engraved-almanac art of that scene: scientific plates, instrument
+          diagrams, and a field humming at the edge of the page.
+        </p>
+        <p class="lead__note">
+          This site is a personal project and not affiliated with any of my employers.
+        </p>
+      </div>
+
+      <h2 class="sub">What I work on</h2>
+      <div class="tracks">
+        {tracks.map((t) => (
+          <div class="track">
+            <div class="track__glyph"><Glyph name={t.glyph} size={56} /></div>
+            <h3 class="track__name">{t.name}</h3>
+            <p class="track__body">{t.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="cols">
+        <div class="col">
+          <h2 class="sub">Toolkit</h2>
+          <ul class="chips">
+            {toolkit.map((t) => <li class="chip">{t}</li>)}
+          </ul>
+          <p class="col__note mono">TODO: Swap in DAW, synths, the works.</p>
+        </div>
+
+        <div class="col">
+          <h2 class="sub">Currently</h2>
+          <ul class="now">
+            {currently.map((c) => <li class="now__item">{c}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { margin-bottom: var(--s-5); }
+  .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
+
+  .lead { margin-bottom: var(--s-7); }
+  .lead p + p { margin-top: 1.1rem; }
+  .lead__note { margin-top: 1.4rem; color: var(--mid); font-style: italic; font-size: var(--step--1); }
+
+  .sub {
+    font-size: var(--step-0);
+    font-variation-settings: 'opsz' 36, 'wght' 560, 'SOFT' 0, 'WONK' 0;
+    letter-spacing: 0.02em;
+    color: var(--silver);
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: var(--s-4);
+  }
+
+  .tracks {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+    margin-bottom: var(--s-7);
+  }
+  @media (min-width: 760px) { .tracks { grid-template-columns: repeat(3, 1fr); } }
+  .track {
+    padding: 1.2rem;
+    background: var(--ink-2);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+  }
+  .track__glyph { color: var(--signal); margin-bottom: 1rem; }
+  .track__name {
+    font-size: var(--step-1);
+    font-variation-settings: 'opsz' 40, 'wght' 540, 'SOFT' 0, 'WONK' 0;
+  }
+  .track__body { margin-top: 0.5rem; color: var(--silver-dim); font-size: var(--step--1); line-height: 1.55; }
+
+  .cols { display: grid; grid-template-columns: 1fr; gap: var(--s-6); }
+  @media (min-width: 760px) { .cols { grid-template-columns: 1fr 1fr; } }
+
+  .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip {
+    font-family: var(--mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.06em;
+    color: var(--silver-dim);
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+  }
+  .col__note { margin-top: 0.9rem; color: var(--mid); }
+
+  .now { list-style: none; display: flex; flex-direction: column; gap: 0.9rem; }
+  .now__item {
+    position: relative;
+    padding-left: 1.3rem;
+    color: var(--silver-dim);
+    font-size: var(--step--1);
+    line-height: 1.55;
+  }
+  .now__item::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--signal);
+  }
+</style>

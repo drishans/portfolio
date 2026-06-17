@@ -1,0 +1,28 @@
+---
+import Project from '../../layouts/Project.astro';
+import { getCollection, render } from 'astro:content';
+import { byOrder } from '../../utils';
+
+export async function getStaticPaths() {
+  const items = (await getCollection('work', ({ data }) => !data.draft)).sort(byOrder);
+  return items.map((entry, i) => {
+    const prevEntry = items[i - 1];
+    const nextEntry = items[i + 1];
+    return {
+      params: { slug: entry.id },
+      props: {
+        entry,
+        prev: prevEntry ? { title: prevEntry.data.title, href: `/work/${prevEntry.id}/` } : null,
+        next: nextEntry ? { title: nextEntry.data.title, href: `/work/${nextEntry.id}/` } : null,
+      },
+    };
+  });
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Project entry={entry} prev={prev} next={next}>
+  <Content />
+</Project>

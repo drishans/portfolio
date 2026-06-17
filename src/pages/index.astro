@@ -1,0 +1,150 @@
+---
+import Base from '../layouts/Base.astro';
+import GrainField from '../components/GrainField.astro';
+import PlateCard from '../components/PlateCard.astro';
+import NoteRow from '../components/NoteRow.astro';
+import { getCollection } from 'astro:content';
+import { byOrder, byDate, readingMinutes, pad } from '../utils';
+import { SITE } from '../consts';
+
+const work = (await getCollection('work', ({ data }) => !data.draft))
+  .sort(byOrder)
+  .slice(0, 4);
+
+const writing = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort(byDate)
+  .slice(0, 4);
+---
+
+<Base>
+  <!-- HERO: the quantum/signal field, with an instrument-readout label -->
+  <GrainField height="88svh">
+    <div class="wrap hero">
+      <p class="hero__eyebrow">{SITE.tagline}</p>
+      <h1 class="hero__name">{SITE.author} S.</h1>
+      <p class="hero__caption mono">
+        20Hz-20kHz &nbsp;·&nbsp; 32-bit / 96kHz &nbsp;·&nbsp; Hayward, CA
+      </p>
+      <p class="hero__intro measure">
+        I build across quantum computing, AI/ML systems, and the low-level layer between them. 
+        I dabble in landscape photography and digital sound design when the compiler's busy.
+        This is the field guide: selected work and notes from the bench.
+      </p>
+    </div>
+  </GrainField>
+
+  <!-- WORK -->
+  <section class="section">
+    <div class="wrap">
+      <div class="head2">
+        <p class="eyebrow">Selected Work</p>
+        <h2 class="head2__title">Project plates</h2>
+        <a href="/work/" class="head2__all mono">All plates →</a>
+      </div>
+
+      <div class="plates">
+        {work.map((p, i) => (
+          <PlateCard
+            plate={pad(i + 1)}
+            title={p.data.title}
+            summary={p.data.summary}
+            role={p.data.role}
+            year={p.data.year}
+            stack={p.data.stack}
+            glyph={p.data.glyph}
+            href={`/work/${p.id}/`}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WRITING -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="head2">
+        <p class="eyebrow">Writing</p>
+        <h2 class="head2__title">Field notes</h2>
+        <a href="/writing/" class="head2__all mono">All notes →</a>
+      </div>
+
+      <div class="notes">
+        {writing.map((post, i) => (
+          <NoteRow
+            no={pad(i + 1)}
+            title={post.data.title}
+            href={`/writing/${post.id}/`}
+            date={post.data.pubDate}
+            minutes={readingMinutes(post.body)}
+            tags={post.data.tags}
+          />
+        ))}
+        <div class="notes__cap"></div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* hero label */
+  .hero { padding-bottom: clamp(1rem, 3vw, 2.5rem); }
+  .hero__eyebrow {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--signal);
+  }
+  .hero__name {
+    font-size: var(--fs-display);
+    font-variation-settings: 'opsz' 144, 'wght' 600, 'SOFT' 0, 'WONK' 0;
+    line-height: 0.94;
+    letter-spacing: -0.015em;
+    margin-top: 0.4rem;
+    color: var(--silver);
+  }
+  .hero__caption {
+    margin-top: 1rem;
+    color: var(--silver-dim);
+    letter-spacing: 0.1em;
+  }
+  .hero__intro {
+    margin-top: 1.4rem;
+    font-size: var(--step-1);
+    color: var(--silver-dim);
+    line-height: 1.5;
+  }
+
+  /* section headers */
+  .head2 {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 0.5rem 1rem;
+    margin-bottom: var(--s-5);
+  }
+  .head2 .eyebrow { grid-column: 1; }
+  .head2__title { grid-column: 1; font-size: var(--step-3); }
+  .head2__all {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    color: var(--silver-dim);
+    transition: color 0.2s var(--ease);
+  }
+  .head2__all:hover { color: var(--signal); }
+
+  .plates {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-3);
+  }
+  @media (min-width: 900px) {
+    .plates { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .plates { grid-template-columns: 1fr; }
+  }
+
+  .notes { border-bottom: 1px solid var(--hair); }
+</style>

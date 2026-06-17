@@ -1,0 +1,85 @@
+---
+import { SITE, NAV } from '../consts';
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="hdr">
+  <div class="wrap hdr__row">
+    <a href="/" class="hdr__mark" aria-label={`${SITE.author} — home`}>
+      <span class="hdr__name">{SITE.author}</span>
+      <span class="hdr__dot" aria-hidden="true"></span>
+    </a>
+
+    <nav class="hdr__nav" aria-label="Primary">
+      {NAV.map((item) => (
+        <a
+          href={item.href}
+          class:list={['hdr__link', { 'is-active': isActive(item.href) }]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    border-bottom: 1px solid var(--hair);
+  }
+  .hdr__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+  .hdr__mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hdr__name {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 40, 'wght' 560, 'SOFT' 0, 'WONK' 0;
+    font-size: 1.04rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--silver);
+  }
+  .hdr__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--signal);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--signal);
+    opacity: 0.75;
+  }
+  .hdr__nav {
+    display: flex;
+    gap: clamp(1rem, 3vw, 2.2rem);
+  }
+  .hdr__link {
+    font-family: var(--mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--silver-dim);
+    padding-block: 0.4rem;
+    border-top: 1px solid transparent;
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+  }
+  .hdr__link:hover { color: var(--silver); }
+  .hdr__link.is-active {
+    color: var(--signal);
+    border-top-color: var(--signal);
+  }
+</style>

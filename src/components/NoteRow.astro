@@ -1,0 +1,87 @@
+---
+// Writing index row — one "field note" line.
+interface Props {
+  no: string;        // entry number, e.g. "01"
+  title: string;
+  href: string;
+  date: Date;
+  minutes: number;
+  tags?: string[];
+}
+const { no, title, href, date, minutes, tags = [] } = Astro.props;
+const stamp = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+const iso = date.toISOString();
+---
+<a class="note" href={href}>
+  <span class="note__no">№{no}</span>
+  <span class="note__main">
+    <span class="note__title">{title}</span>
+    {tags.length > 0 && <span class="note__tags">{tags.slice(0, 3).join(' · ')}</span>}
+  </span>
+  <span class="note__meta">
+    <time class="note__date" datetime={iso}>{stamp}</time>
+    <span class="note__min">{minutes} min</span>
+  </span>
+  <span class="note__go" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .note {
+    display: grid;
+    grid-template-columns: 3.4rem 1fr auto 1.4rem;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1.3rem;
+    border-top: 1px solid var(--hair);
+    transition: border-color 0.2s var(--ease);
+  }
+  .note:hover { border-top-color: var(--signal); }
+  .note__no {
+    font-family: var(--mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    color: var(--mid);
+  }
+  .note__main { display: flex; flex-direction: column; gap: 0.35rem; }
+  .note__title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 40, 'wght' 520, 'SOFT' 0, 'WONK' 0;
+    font-size: var(--step-1);
+    line-height: 1.14;
+    color: var(--silver);
+    transition: color 0.2s var(--ease);
+  }
+  .note:hover .note__title { color: var(--signal); }
+  .note__tags {
+    font-family: var(--mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .note__meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    font-family: var(--mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.08em;
+    color: var(--mid);
+    white-space: nowrap;
+  }
+  .note__go {
+    color: var(--signal);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+    text-align: right;
+  }
+  .note:hover .note__go { opacity: 1; transform: translateX(0); }
+
+  @media (max-width: 560px) {
+    .note { grid-template-columns: 2.6rem 1fr; }
+    .note__meta { grid-column: 2; align-items: flex-start; flex-direction: row; gap: 0.9rem; margin-top: 0.1rem; }
+    .note__go { display: none; }
+  }
+</style>

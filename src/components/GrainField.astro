@@ -1,0 +1,254 @@
+---
+// The signature element. A hand-written WebGL fragment shader renders a slowly
+// evolving monochrome field — equal parts spectral noise, quantum vacuum
+// fluctuation, and the generative-visuals work. Self-contained vanilla TS.
+// Accepts a <slot/> rendered over the field (used for the hero label).
+interface Props {
+  /** CSS min-height of the field, e.g. "86svh". */
+  height?: string;
+}
+const { height = '86svh' } = Astro.props;
+---
+
+<section class="field" style={`--field-h:${height}`} aria-hidden="false">
+  <!-- CSS fallback: visible if WebGL is unavailable or JS is off. -->
+  <div class="field__fallback"></div>
+  <canvas id="grain-canvas" class="field__canvas"></canvas>
+  <div class="field__scrim"></div>
+  <div class="field__content">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .field {
+    position: relative;
+    min-height: var(--field-h);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: var(--ink);
+    z-index: 2;
+  }
+  .field__fallback,
+  .field__canvas,
+  .field__scrim {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  /* A plausible still of the field for the no-WebGL / no-JS case. */
+  .field__fallback {
+    background:
+      radial-gradient(120% 90% at 72% 18%, #20232b 0%, transparent 55%),
+      radial-gradient(90% 70% at 18% 88%, #181b22 0%, transparent 60%),
+      linear-gradient(160deg, #0c0d10, #14161c 70%, #0b0c0f);
+  }
+  .field__canvas { opacity: 0; transition: opacity 1.1s var(--ease); }
+  .field__canvas.is-ready { opacity: 1; }
+  /* Darken the bottom so the label always reads. */
+  .field__scrim {
+    background: linear-gradient(to top, rgba(10,11,14,0.92) 0%, rgba(10,11,14,0.35) 28%, transparent 60%);
+    pointer-events: none;
+  }
+  .field__content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    padding-bottom: clamp(2rem, 5vw, 4rem);
+  }
+</style>
+
+<script>
+  type GL = WebGLRenderingContext;
+
+  const canvas = document.getElementById('grain-canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const gl = (canvas.getContext('webgl', { antialias: false, alpha: false }) ||
+      canvas.getContext('experimental-webgl', { antialias: false, alpha: false })) as GL | null;
+
+    if (gl) {
+      const VERT = `
+        attribute vec2 a_pos;
+        void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }
+      `;
+      const FRAG = `
+        precision highp float;
+        uniform vec2  u_res;
+        uniform float u_time;
+        uniform vec2  u_mouse;
+        uniform float u_reduced;
+
+        float hash(vec2 p){
+          p = fract(p * vec2(123.34, 456.21));
+          p += dot(p, p + 45.32);
+          return fract(p.x * p.y);
+        }
+        float noise(vec2 p){
+          vec2 i = floor(p), f = fract(p);
+          vec2 u = f*f*(3.0-2.0*f);
+          float a = hash(i);
+          float b = hash(i+vec2(1.0,0.0));
+          float c = hash(i+vec2(0.0,1.0));
+          float d = hash(i+vec2(1.0,1.0));
+          return mix(mix(a,b,u.x), mix(c,d,u.x), u.y);
+        }
+        float fbm(vec2 p){
+          float v = 0.0, a = 0.5;
+          mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+          for(int i=0;i<5;i++){ v += a*noise(p); p = m*p; a *= 0.5; }
+          return v;
+        }
+        void main(){
+          vec2 uv = gl_FragCoord.xy / u_res;
+          vec2 p  = (gl_FragCoord.xy - 0.5*u_res) / u_res.y;
+          float t = u_time * (u_reduced > 0.5 ? 0.0 : 1.0);
+
+          // domain-warped fbm — the evolving field texture
+          vec2 q = vec2(fbm(p*1.6 + vec2(0.0,  t*0.030)),
+                        fbm(p*1.6 + vec2(5.2, -t*0.025)));
+          vec2 r = vec2(fbm(p*1.6 + 2.4*q + vec2(1.7, 9.2) + t*0.020),
+                        fbm(p*1.6 + 2.4*q + vec2(8.3, 2.8) - t*0.018));
+          float f = fbm(p*1.6 + 3.0*r);
+
+          float lum = smoothstep(0.12, 1.05, f);
+          vec3 inkC = vec3(0.039, 0.047, 0.059);
+          vec3 hiC  = vec3(0.62, 0.64, 0.69);
+          vec3 col  = mix(inkC, hiC, lum * 0.40);
+
+          // faint isolux banding, like contour lines on a field chart
+          col += 0.018 * smoothstep(0.46, 0.5, abs(fract(f*4.0)-0.5));
+
+          // cursor-tracked signal glow — teal core, violet fringe (duotone)
+          vec2 mp = (u_mouse*u_res - 0.5*u_res)/u_res.y;
+          float d = length(p - mp);
+          float glow = exp(-d*2.7) * 0.55;
+          vec3 amberC  = vec3(0.824, 0.510, 0.243); // unused for now
+          vec3 tealC   = vec3(0.37, 0.78, 0.80);
+          vec3 violetC = vec3(0.61, 0.56, 0.88);
+          vec3 glowC   = mix(violetC, amberC, clamp(glow*1.8, 0.0, 1.0));
+          col += glowC * glow * (0.5 + 0.5*lum);
+
+          // vignette
+          float vig = smoothstep(1.25, 0.25, length(uv-0.5));
+          col *= mix(0.70, 1.0, vig);
+
+          // fine grain
+          float g = hash(gl_FragCoord.xy + fract(t)*vec2(13.1, 7.7));
+          col += (g - 0.5) * 0.045;
+
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `;
+
+      const compile = (type: number, src: string) => {
+        const s = gl.createShader(type)!;
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.warn('shader:', gl.getShaderInfoLog(s));
+          return null;
+        }
+        return s;
+      };
+
+      const vs = compile(gl.VERTEX_SHADER, VERT);
+      const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+      const prog = vs && fs ? gl.createProgram()! : null;
+
+      if (prog && vs && fs) {
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+
+        if (gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          gl.useProgram(prog);
+
+          // fullscreen triangle
+          const buf = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+          const loc = gl.getAttribLocation(prog, 'a_pos');
+          gl.enableVertexAttribArray(loc);
+          gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+          const uRes = gl.getUniformLocation(prog, 'u_res');
+          const uTime = gl.getUniformLocation(prog, 'u_time');
+          const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+          const uReduced = gl.getUniformLocation(prog, 'u_reduced');
+          gl.uniform1f(uReduced, reduce ? 1 : 0);
+
+          const mouse = { x: 0.7, y: 0.7 };
+          const target = { x: 0.7, y: 0.7 };
+
+          const resize = () => {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
+            const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
+            if (canvas.width !== w || canvas.height !== h) {
+              canvas.width = w;
+              canvas.height = h;
+              gl.viewport(0, 0, w, h);
+            }
+            gl.uniform2f(uRes, canvas.width, canvas.height);
+          };
+
+          let raf = 0;
+          let running = false;
+          const start = performance.now();
+
+          const frame = (now: number) => {
+            mouse.x += (target.x - mouse.x) * 0.06;
+            mouse.y += (target.y - mouse.y) * 0.06;
+            gl.uniform2f(uMouse, mouse.x, mouse.y);
+            gl.uniform1f(uTime, (now - start) / 1000);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            raf = requestAnimationFrame(frame);
+          };
+
+          const play = () => {
+            if (running || reduce) return;
+            running = true;
+            raf = requestAnimationFrame(frame);
+          };
+          const stop = () => {
+            running = false;
+            cancelAnimationFrame(raf);
+          };
+
+          const drawOnce = () => {
+            gl.uniform2f(uMouse, mouse.x, mouse.y);
+            gl.uniform1f(uTime, (performance.now() - start) / 1000);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+          };
+
+          window.addEventListener('pointermove', (e) => {
+            target.x = e.clientX / window.innerWidth;
+            target.y = 1 - e.clientY / window.innerHeight;
+          }, { passive: true });
+
+          window.addEventListener('resize', () => { resize(); if (reduce) drawOnce(); }, { passive: true });
+
+          // pause when off-screen or tab hidden
+          const io = new IntersectionObserver(([en]) => {
+            if (en.isIntersecting) play();
+            else stop();
+          }, { threshold: 0 });
+          io.observe(canvas);
+
+          document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stop();
+            else if (!reduce) play();
+          });
+
+          resize();
+          canvas.classList.add('is-ready');
+          if (reduce) drawOnce();
+          else play();
+        }
+      }
+    }
+  }
+</script>
