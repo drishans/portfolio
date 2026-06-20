@@ -2,7 +2,7 @@
 title: QuDaQ
 summary: Quantum data acquisition and instrument control tooling for benchmarking real cryogenic superconducting hardware at NIST Boulder.
 role: Research contribution
-stack: ['Python', 'Qiskit', 'NumPy', 'Randomized Benchmarking']
+stack: ['Python', 'Qt', 'RPyC']
 year: 2024
 length: '~10 months'
 order: 1

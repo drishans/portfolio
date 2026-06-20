@@ -2,7 +2,7 @@
 title: Retrieval Pipeline
 summary: A production RAG system on Vertex AI and Gemini for a deployment and orchestration platform — retrieval that holds up once real users and real documents arrive.
 role: Early engineer
-stack: ['Python', 'Vertex AI', 'Gemini', 'RAG', 'PostgreSQL']
+stack: ['Vertex AI', 'ADK', 'RAG', 'SAP BTP', 'Joule']
 year: 2025
 length: 'Ongoing'
 order: 3

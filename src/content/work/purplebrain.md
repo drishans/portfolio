@@ -2,7 +2,7 @@
 title: PurpleBrain
 summary: A real-time pipeline that turns raw EEG into FM synthesis — brain activity driving sound with low enough latency to feel immediate.
 role: Engineer
-stack: ['Rust', 'DSP', 'Real-time audio', 'EEG']
+stack: ['Max/MSP', 'DSP', 'Real-time audio', 'EEG']
 year: 2025
 length: '~4 months'
 order: 2

@@ -4,7 +4,7 @@ export const SITE = {
   /** Your name — used in the wordmark and as the OG site name. */
   author: 'Drishan',
   /** Browser tab title / OG site title. */
-  title: 'Drishan\'s Portfolio -- Quantum · AI · Systems',
+  title: 'Drishan Sarkar -- Quantum · AI · Systems',
   /** Default meta description and RSS feed description. */
   description:
     'Engineer working across quantum computing, AI systems, and the low-level glue between them. Selected work and writing.',
