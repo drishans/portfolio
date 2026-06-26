@@ -1,0 +1,51 @@
+name: Relock (Linux)
+
+# We develop on Windows but deploy on Linux (Cloudflare Pages). npm's cross-platform
+# optional-dependency bug (npm/cli#4828) means a Windows-generated package-lock.json
+# omits Linux-only peer-dep edges (@emnapi via @napi-rs/wasm-runtime), so Cloudflare's
+# strict `npm ci` fails. This regenerates the lockfile ON LINUX and commits it back,
+# so the committed lockfile is correct everywhere and `npm ci` passes.
+#
+# Workflow note: let this Action own package-lock.json. When you change deps, edit
+# package.json (run `npm install` locally for dev as usual), push, and let this
+# regenerate + commit the lockfile. Avoid committing a Windows-generated lockfile.
+
+on:
+  push:
+    paths:
+      - package.json          # whenever dependencies change
+  workflow_dispatch:           # or trigger it manually
+
+permissions:
+  contents: write              # to commit the regenerated lockfile
+
+concurrency:
+  group: relock-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  relock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # track Cloudflare Pages' Node major (currently 22.x / npm 10)
+
+      - name: Regenerate lockfile on Linux
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
+
+      - name: Commit the Linux lockfile if it changed
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "package-lock.json already correct - nothing to commit."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "Regenerate package-lock.json on Linux"
+            git push
+          fi
