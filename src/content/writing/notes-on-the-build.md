@@ -1,9 +1,9 @@
 ---
 title: Notes on building this
 description: Why this site reads like an engraved field guide, ships zero JavaScript by default, and renders its hero with a hand-written shader instead of a stock library.
-pubDate: 2026-06-02
+pubDate: 1996-01-19
 tags: ['design', 'web', 'astro']
-draft: true
+draft: false
 ---
 
 Most engineering portfolios look the same right now, and it isn't the authors'
