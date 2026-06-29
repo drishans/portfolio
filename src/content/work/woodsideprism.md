@@ -1,5 +1,5 @@
 ---
-title: Retrieval Pipeline
+title: Woodside Prism
 summary: A production RAG system on Vertex AI and Gemini for a deployment and orchestration platform — retrieval that holds up once real users and real documents arrive.
 role: Early engineer
 stack: ['Vertex AI', 'ADK', 'RAG', 'SAP BTP', 'Joule']
