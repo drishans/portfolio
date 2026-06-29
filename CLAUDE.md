@@ -67,13 +67,6 @@ All visual design is CSS custom properties at the top of
 spacing (`--s-*`), fonts. Components reference these tokens; change the system
 there, not in component `<style>` blocks.
 
-**Gotcha — the live accent is amber, not teal.** The README and the CSS header
-comment describe `--signal` as luminous teal (`#5ec6cb`). But in `:root` the teal
-`--signal`/`--signal-2` lines are *inside an unterminated block comment* (the
-comment opened on the `/* --- Signal` line only closes after `pressed / dim
-accent */`), so the actually-applied values are the amber pair below them
-(`--signal: #d2823e`). If you touch the palette, mind that comment boundary.
-
 **Fonts** are self-hosted variable fonts via `@fontsource-variable` (no external
 requests), imported in `BaseHead.astro`. Headings (Fraunces) are driven by
 optical-size/weight axes through `font-variation-settings` — Fraunces must use
@@ -89,3 +82,32 @@ Preserve those three fallback paths when editing it.
 `Base.astro` (HTML shell: `BaseHead` + `Header` + `<slot/>` + `Footer`) is
 wrapped by `Project.astro` (work case-study template) and `Post.astro` (field
 note). The slug routes pass a rendered `<Content />` into those layouts.
+
+## Commit conventions
+
+Use Conventional Commits: `type(scope): summary`
+
+- Summary in imperative mood, lowercase, no trailing period, under ~60 chars.
+- One logical change per commit (a new post is its own commit; don't fold in unrelated CSS tweaks).
+- Add a body (blank line, then prose) only when the *why* isn't obvious from the summary.
+
+**Types**
+- `content` — new or substantially edited post or project entry
+- `feat` — new site feature or component
+- `fix` — bug fix
+- `style` — visual/CSS/design change with no logic change
+- `chore` — config, deps, tooling, build, docs setup
+- `docs` — README or code comments
+- `refactor` — restructuring without behavior change
+
+**Scopes** (optional): `writing`, `work`, `home`, `about`, `og`, `fonts`, `seo`, `deploy`
+
+**Examples**
+- `content(writing): add field note on cuQuantum on the 5090`
+- `content(work): add QuDaQ plate`
+- `feat(home): add accent-color switcher`
+- `style(og): simplify share image to wordmark + wave`
+- `chore(fonts): swap Fraunces for Space Grotesk`
+- `docs: update README for field-guide concept`
+
+Do not add Claude/AI attribution or co-author trailers to commit messages.
