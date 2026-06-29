@@ -28,4 +28,4 @@ Registration was fail-closed: emails get validated against a Google Sheet. If th
 
 > The trickier part was trust without blindness. The admin dashboard can adjust prize stock, but it rejects any adjustment that would set a total below tickets already issued—you can't retroactively unsell prizes.
 
-It's live at https://spinwin.fly.dev. And yeah, something broke mid-event. But that's a different story.
+It's live at https://spinwin.fly.dev. And yeah, [something broke mid-event](/writing/spinwin-scanner-outage/). But that's a different story.

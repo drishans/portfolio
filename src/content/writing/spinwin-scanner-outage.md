@@ -3,7 +3,7 @@ title: The Scanner Went Down Mid-Event
 description: A static import, a missing build step, and a 30-second triage from a phone
 pubDate: 2026-06-12
 tags: ['rust', 'wasm', 'postmortem', 'deploy']
-draft: true
+draft: false
 ---
 
 Mid-event, the scanner stopped working. Every ticket came back invalid. People were lined up at the prize desk. I was triaging from my phone on Claude Code, maybe had a few minutes of attention.
