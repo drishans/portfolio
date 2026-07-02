@@ -2,6 +2,8 @@
 import Base from './Base.astro';
 import Readout from '../components/Readout.astro';
 import type { CollectionEntry } from 'astro:content';
+import { getPublished } from '../utils';
+import { TOPICS } from '../consts';
 
 interface Props {
   entry: CollectionEntry<'work'>;
@@ -16,7 +18,17 @@ const rows = [
   ...(d.length ? [{ k: 'Length', v: d.length }] : []),
   { k: 'Year', v: String(d.year) },
   ...(d.stack.length ? [{ k: 'Stack', v: d.stack.join(', ') }] : []),
+  ...(d.topics.length ? [{ k: 'Topics', v: d.topics.map((t) => TOPICS[t]).join(', ') }] : []),
 ];
+
+// Tutorial series that grew out of this plate (visible once a part is published,
+// same rule as /series/ and the topic hubs).
+const publishedWriting = await getPublished('writing');
+const relatedSeries = (await getPublished('series')).filter(
+  (s) =>
+    s.data.project?.id === entry.id &&
+    publishedWriting.some((p) => p.data.series?.id.id === s.id),
+);
 ---
 
 <Base title={`${d.title} — Work`} description={d.summary} type="article">
@@ -33,10 +45,13 @@ const rows = [
       <div class="grid">
         <aside class="grid__meta">
           <Readout rows={rows} />
-          {(d.repo || d.live) && (
+          {(d.repo || d.live || relatedSeries.length > 0) && (
             <div class="links">
               {d.repo && <a class="link mono" href={d.repo} target="_blank" rel="noopener">Repository →</a>}
               {d.live && <a class="link mono" href={d.live} target="_blank" rel="noopener">Live →</a>}
+              {relatedSeries.map((s) => (
+                <a class="link mono" href={`/series/${s.id}/`}>Tutorial series →</a>
+              ))}
             </div>
           )}
         </aside>

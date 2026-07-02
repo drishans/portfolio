@@ -1,0 +1,11 @@
+# Cloudflare Pages redirects — the permalink insurance policy.
+#
+# URLs on this site are forever: never delete or rename a published path
+# without adding a 301 here first. One rule per line:
+#
+#   /old-path/  /new-path/  301
+#
+# Notes (Cloudflare Pages rules):
+# - Static rules MUST come before any dynamic (splat/placeholder) rules,
+#   or rules are silently dropped.
+# - Limits: 2,000 static + 100 dynamic rules.

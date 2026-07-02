@@ -1,6 +1,7 @@
 ---
 // Project card — renders a numbered "PLATE" in the field guide.
 import Glyph from './Glyph.astro';
+import type { GlyphName } from '../consts';
 interface Props {
   plate: string; // zero-padded, e.g. "01"
   title: string;
@@ -9,9 +10,12 @@ interface Props {
   year: number;
   stack?: string[];
   href: string;
-  glyph?: 'waveform' | 'spectrum' | 'contour' | 'polar' | 'phases';
+  glyph?: GlyphName;
+  /** 'h2' directly under a page h1, 'h3' inside an h2-titled section. */
+  headingLevel?: 'h2' | 'h3';
 }
-const { plate, title, summary, role, year, stack = [], href, glyph = 'waveform' } = Astro.props;
+const { plate, title, summary, role, year, stack = [], href, glyph = 'waveform', headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
 ---
 
 <a class="plate" href={href}>
@@ -23,7 +27,7 @@ const { plate, title, summary, role, year, stack = [], href, glyph = 'waveform' 
   <div class="plate__glyph"><Glyph name={glyph} size={50} /></div>
 
   <div class="plate__body">
-    <h3 class="plate__title">{title}</h3>
+    <Heading class="plate__title">{title}</Heading>
     <p class="plate__summary">{summary}</p>
   </div>
 

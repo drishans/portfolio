@@ -7,6 +7,7 @@ year: 2025
 length: '~4 months'
 order: 2
 glyph: waveform
+topics: ['audio']
 draft: false
 ---
 

@@ -1,21 +1,38 @@
 ---
 import Base from './Base.astro';
 import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
+import { formatDate } from '../utils';
+import { TOPICS } from '../consts';
 
 interface Props {
   entry: CollectionEntry<'writing'>;
   minutes: number;
-  prev?: { title: string; href: string } | null;
-  next?: { title: string; href: string } | null;
+  prev?: { title: string; href: string; label?: string } | null;
+  next?: { title: string; href: string; label?: string } | null;
+  /** From render() — drives the build-time table of contents. */
+  headings?: MarkdownHeading[];
+  /** Set when the post is part of a series. */
+  series?: { title: string; href: string; part: number; total: number } | null;
 }
-const { entry, minutes, prev, next } = Astro.props;
+const { entry, minutes, prev, next, headings = [], series = null } = Astro.props;
 const d = entry.data;
-const stamp = d.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const stamp = formatDate(d.pubDate);
 const iso = d.pubDate.toISOString();
-const updated = d.updatedDate?.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const updated = d.updatedDate && formatDate(d.updatedDate);
+
+// A contents block earns its place on long tutorial-shaped posts only.
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = toc.length >= 4;
 ---
 
-<Base title={`${d.title} — Writing`} description={d.description} type="article">
+<Base
+  title={`${d.title} — Writing`}
+  description={d.description}
+  type="article"
+  publishedTime={d.pubDate}
+  modifiedTime={d.updatedDate}
+>
   <article class="section">
     <div class="wrap">
       <a href="/writing/" class="back mono">← All field notes</a>
@@ -25,14 +42,37 @@ const updated = d.updatedDate?.toLocaleDateString('en-US', { year: 'numeric', mo
           <time datetime={iso}>{stamp}</time>
           <span class="head__sep">/</span>
           <span>{minutes} min read</span>
+          {d.topics.map((t) => (
+            <><span class="head__sep">/</span><a class="head__topic" href={`/topics/${t}/`}>{TOPICS[t]}</a></>
+          ))}
           {d.tags.length > 0 && <><span class="head__sep">/</span><span>{d.tags.join(' · ')}</span></>}
         </p>
         <h1 class="head__title">{d.title}</h1>
         <p class="head__desc">{d.description}</p>
         {updated && <p class="head__upd mono">Updated {updated}</p>}
+        {series && (
+          <a class="series" href={series.href}>
+            <span class="series__part mono">Part {series.part} of {series.total}</span>
+            <span class="series__title">{series.title}</span>
+            <span class="series__go mono">All parts →</span>
+          </a>
+        )}
       </header>
 
       <hr class="rule head__rule" />
+
+      {showToc && (
+        <nav class="toc measure" aria-label="Contents">
+          <p class="toc__label mono">Contents</p>
+          <ol class="toc__list">
+            {toc.map((h) => (
+              <li class:list={['toc__item', { 'toc__item--sub': h.depth === 3 }]}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
 
       <div class="prose body">
         <slot />
@@ -41,13 +81,13 @@ const updated = d.updatedDate?.toLocaleDateString('en-US', { year: 'numeric', mo
       <nav class="pn" aria-label="More writing">
         {prev ? (
           <a class="pn__item" href={prev.href}>
-            <span class="mono">← Previous</span>
+            <span class="mono">{prev.label ?? '← Previous'}</span>
             <span class="pn__title">{prev.title}</span>
           </a>
         ) : <span></span>}
         {next ? (
           <a class="pn__item pn__item--next" href={next.href}>
-            <span class="mono">Next →</span>
+            <span class="mono">{next.label ?? 'Next →'}</span>
             <span class="pn__title">{next.title}</span>
           </a>
         ) : <span></span>}
@@ -63,10 +103,68 @@ const updated = d.updatedDate?.toLocaleDateString('en-US', { year: 'numeric', mo
   .head { margin-inline: auto; max-width: var(--measure); }
   .head__line { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
   .head__sep { color: var(--hair-bright); }
+  .head__topic {
+    color: var(--signal);
+    /* not hue-alone: the underline marks it as a link next to plain meta text */
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    transition: color 0.2s var(--ease);
+  }
+  .head__topic:hover { color: var(--silver); }
   .head__title { font-size: var(--step-4); margin-top: 1rem; }
   .head__desc { margin-top: 1rem; font-size: var(--step-1); color: var(--silver-dim); line-height: 1.5; font-style: italic; }
   .head__upd { margin-top: 0.8rem; color: var(--mid); }
   .head__rule { max-width: var(--measure); margin: var(--s-5) auto; }
+
+  .series {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+    margin-top: 1.6rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--hair);
+    border-left: 2px solid var(--signal);
+    border-radius: var(--radius);
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .series:hover { border-color: var(--hair-bright); background: var(--ink-2); }
+  .series__part { color: var(--signal); }
+  .series__title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 36, 'wght' 540, 'SOFT' 0, 'WONK' 0;
+    color: var(--silver);
+  }
+  .series__go { margin-left: auto; color: var(--mid); }
+  .series:hover .series__go { color: var(--signal); }
+
+  .toc {
+    margin: calc(-1 * var(--s-4)) auto var(--s-5);
+    max-width: var(--measure);
+    padding: 1.1rem 1.3rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    background: var(--ink-2);
+  }
+  .toc__label { color: var(--mid); letter-spacing: 0.22em; }
+  .toc__list {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.7rem;
+    columns: 2;
+    column-gap: var(--s-5);
+  }
+  .toc__item { margin-top: 0.35rem; break-inside: avoid; }
+  .toc__item--sub { padding-left: 1rem; }
+  .toc__item a {
+    color: var(--silver-dim);
+    font-size: var(--step--1);
+    line-height: 1.45;
+    transition: color 0.2s var(--ease);
+  }
+  .toc__item a:hover { color: var(--signal); }
+  @media (max-width: 640px) { .toc__list { columns: 1; } }
 
   .body { margin-inline: auto; }
 

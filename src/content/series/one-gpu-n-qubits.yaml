@@ -1,0 +1,14 @@
+# A series is one YAML file; posts join it via their `series` frontmatter field.
+title: One GPU, N Qubits
+description: >-
+  How far quantum simulation goes on one consumer graphics card — cuQuantum,
+  the memory wall, and the escape routes past it. Measured honestly, on a desk,
+  no cluster in sight.
+level: working
+topics: ['quantum', 'scicomp']
+project: qudaq
+prerequisites:
+  - Linear algebra at the "matrix times vector" level
+  - Comfort with Python and a terminal
+  - An NVIDIA GPU if you want to run along (any recent card works, smaller N)
+draft: true

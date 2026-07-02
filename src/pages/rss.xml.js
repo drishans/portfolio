@@ -1,10 +1,9 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
 import { SITE } from '../consts';
-import { byDate } from '../utils';
+import { getPublished, byDate } from '../utils';
 
 export async function GET(context) {
-  const posts = (await getCollection('writing', ({ data }) => !data.draft)).sort(byDate);
+  const posts = (await getPublished('writing')).sort(byDate);
   return rss({
     title: SITE.title,
     description: SITE.description,

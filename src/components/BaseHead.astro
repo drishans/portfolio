@@ -6,6 +6,10 @@ import '@fontsource-variable/fraunces/full.css';
 import '@fontsource-variable/newsreader/wght.css';
 import '@fontsource-variable/newsreader/wght-italic.css';
 import '@fontsource-variable/jetbrains-mono/wght.css';
+// Math: self-hosted STIX Two Math + Temml's vendored support stylesheet for
+// the MathML emitted from $…$ / $$…$$ at build time.
+import '@fontsource/stix-two-math';
+import '../styles/temml.css';
 import '../styles/global.css';
 import { SITE } from '../consts';
 
@@ -15,6 +19,9 @@ interface Props {
   image?: string;
   /** 'website' for index/listing pages, 'article' for blog posts. */
   type?: 'website' | 'article';
+  /** Article dates — only emitted when type is 'article'. */
+  publishedTime?: Date;
+  modifiedTime?: Date;
 }
 
 const {
@@ -22,6 +29,8 @@ const {
   description = SITE.description,
   image = SITE.ogImage,
   type = 'website',
+  publishedTime,
+  modifiedTime,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -32,7 +41,8 @@ const ogImage = new URL(image, Astro.site);
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="generator" content={Astro.generator} />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<meta name="theme-color" content="#0e0f12" />
+<!-- Keep in sync with --ink in global.css. -->
+<meta name="theme-color" content="#0a0c0f" />
 <meta name="color-scheme" content="dark" />
 
 <title>{title}</title>
@@ -49,6 +59,15 @@ const ogImage = new URL(image, Astro.site);
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={SITE.ogImageAlt} />
+{type === 'article' && publishedTime && (
+  <meta property="article:published_time" content={publishedTime.toISOString()} />
+)}
+{type === 'article' && modifiedTime && (
+  <meta property="article:modified_time" content={modifiedTime.toISOString()} />
+)}
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />

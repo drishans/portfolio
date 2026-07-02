@@ -7,6 +7,7 @@ year: 2025
 length: 'Ongoing'
 order: 3
 glyph: spectrum
+topics: ['ai']
 draft: false
 ---
 
