@@ -1,7 +1,7 @@
 ---
 title: Notes on building this
 description: Why this site reads like an engraved field guide, ships zero JavaScript by default, and renders its hero with a hand-written shader instead of a stock library.
-pubDate: 1996-01-19
+pubDate: 2026-06-29
 tags: ['design', 'web', 'astro']
 draft: false
 ---
