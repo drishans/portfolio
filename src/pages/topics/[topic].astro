@@ -1,0 +1,148 @@
+---
+import Base from '../../layouts/Base.astro';
+import PlateCard from '../../components/PlateCard.astro';
+import NoteRow from '../../components/NoteRow.astro';
+import { getPublished, byOrder, byDate, readingMinutes, noteNumbers, plateNumbers } from '../../utils';
+import { SITE, TOPICS, type TopicSlug } from '../../consts';
+
+export async function getStaticPaths() {
+  const work = await getPublished('work');
+  const writing = await getPublished('writing');
+  // A hub page exists only once a topic has published content.
+  return (Object.keys(TOPICS) as TopicSlug[])
+    .filter(
+      (t) =>
+        work.some((w) => w.data.topics.includes(t)) ||
+        writing.some((p) => p.data.topics.includes(t)),
+    )
+    .map((topic) => ({ params: { topic } }));
+}
+
+const topic = Astro.params.topic as TopicSlug;
+const name = TOPICS[topic];
+
+const allWork = await getPublished('work');
+const plateNos = plateNumbers(allWork);
+const work = allWork.filter((w) => w.data.topics.includes(topic)).sort(byOrder);
+
+const allWriting = (await getPublished('writing')).sort(byDate);
+const numbers = noteNumbers(allWriting);
+const writing = allWriting.filter((p) => p.data.topics.includes(topic));
+
+// Same visibility rule as /series/: a series appears once it has a published part.
+const series = (await getPublished('series')).filter(
+  (s) =>
+    s.data.topics.includes(topic) &&
+    allWriting.some((p) => p.data.series?.id.id === s.id),
+);
+---
+
+<Base title={`${name} — ${SITE.author}`} description={`Everything in the field guide filed under ${name.toLowerCase()}: project plates, field notes, and tutorial series.`}>
+  <section class="section">
+    <div class="wrap">
+      <header class="top">
+        <p class="eyebrow"><a class="top__crumb" href="/topics/">Topics</a></p>
+        <h1 class="top__title">{name}</h1>
+      </header>
+
+      {series.length > 0 && (
+        <div class="block">
+          <h2 class="block__title mono">Series</h2>
+          <div class="serieslist">
+            {series.map((s) => (
+              <a class="serieslink" href={`/series/${s.id}/`}>
+                <span class="serieslink__title">{s.data.title}</span>
+                <span class="serieslink__desc">{s.data.description}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {work.length > 0 && (
+        <div class="block">
+          <h2 class="block__title mono">Plates</h2>
+          <div class="plates">
+            {work.map((p) => (
+              <PlateCard
+                plate={plateNos.get(p.id)!}
+                title={p.data.title}
+                summary={p.data.summary}
+                role={p.data.role}
+                year={p.data.year}
+                stack={p.data.stack}
+                glyph={p.data.glyph}
+                href={`/work/${p.id}/`}
+                headingLevel="h3"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {writing.length > 0 && (
+        <div class="block">
+          <h2 class="block__title mono">Field notes</h2>
+          <div class="notes">
+            {writing.map((post) => (
+              <NoteRow
+                no={numbers.get(post.id)!}
+                title={post.data.title}
+                href={`/writing/${post.id}/`}
+                date={post.data.pubDate}
+                minutes={readingMinutes(post.body)}
+                tags={post.data.tags}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { margin-bottom: var(--s-6); }
+  .top__crumb { transition: color 0.2s var(--ease); }
+  .top__crumb:hover { color: var(--silver); }
+  .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
+
+  .block { margin-bottom: var(--s-6); }
+  .block__title {
+    color: var(--mid);
+    letter-spacing: 0.22em;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: var(--s-4);
+    font-weight: 500;
+    /* neutralize the global heading axes — this is a mono label, not display type */
+    font-variation-settings: normal;
+    font-size: var(--step--2);
+  }
+
+  .serieslist { display: flex; flex-direction: column; gap: var(--s-3); max-width: var(--measure); }
+  .serieslink {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--hair);
+    border-left: 2px solid var(--signal);
+    border-radius: var(--radius);
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .serieslink:hover { border-color: var(--hair-bright); background: var(--ink-2); }
+  .serieslink__title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 40, 'wght' 540, 'SOFT' 0, 'WONK' 0;
+    font-size: var(--step-1);
+    color: var(--silver);
+  }
+  .serieslink__desc { color: var(--silver-dim); font-size: var(--step--1); line-height: 1.55; }
+
+  .plates { display: grid; grid-template-columns: 1fr; gap: var(--s-3); }
+  @media (min-width: 620px) { .plates { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .plates { grid-template-columns: repeat(3, 1fr); } }
+
+  .notes { border-bottom: 1px solid var(--hair); }
+</style>

@@ -1,23 +1,29 @@
 ---
 import Base from '../../layouts/Base.astro';
 import NoteRow from '../../components/NoteRow.astro';
-import { getCollection } from 'astro:content';
-import { byDate, readingMinutes, pad } from '../../utils';
+import { getPublished, byDate, readingMinutes, noteNumbers } from '../../utils';
+import { SITE, TOPICS, type TopicSlug } from '../../consts';
 
-const posts = (await getCollection('writing', ({ data }) => !data.draft)).sort(byDate);
+const posts = (await getPublished('writing')).sort(byDate);
+const numbers = noteNumbers(posts);
+
+// Topic chips — only topics with published content anywhere on the site.
+const work = await getPublished('work');
+const live = (Object.keys(TOPICS) as TopicSlug[]).filter((t) =>
+  posts.some((p) => p.data.topics.includes(t)) || work.some((w) => w.data.topics.includes(t)),
+);
 
 // Group by year for the index.
 const groups = new Map<number, typeof posts>();
 for (const p of posts) {
-  const y = p.data.pubDate.getFullYear();
+  const y = p.data.pubDate.getUTCFullYear();
   if (!groups.has(y)) groups.set(y, []);
   groups.get(y)!.push(p);
 }
 const years = [...groups.keys()].sort((a, b) => b - a);
-let counter = 0;
 ---
 
-<Base title="Writing — Drishan" description="Field notes on quantum computing, AI systems, GPU work, sound, and the craft of building.">
+<Base title={`Writing — ${SITE.author}`} description="Field notes on quantum computing, AI systems, GPU work, sound, and the craft of building.">
   <section class="section">
     <div class="wrap">
       <header class="top">
@@ -27,25 +33,29 @@ let counter = 0;
           Notes from the bench; quantum, AI systems, GPU work, sound design, and
           whatever I'm taking apart this month.
         </p>
+        {live.length > 0 && (
+          <nav class="filters" aria-label="Browse by topic">
+            {live.map((t) => (
+              <a class="filters__chip mono" href={`/topics/${t}/`}>{TOPICS[t]}</a>
+            ))}
+          </nav>
+        )}
       </header>
 
       {years.map((year) => (
         <section class="year">
           <p class="year__label mono">{year}</p>
           <div class="year__list">
-            {groups.get(year)!.map((post) => {
-              counter += 1;
-              return (
-                <NoteRow
-                  no={pad(counter)}
-                  title={post.data.title}
-                  href={`/writing/${post.id}/`}
-                  date={post.data.pubDate}
-                  minutes={readingMinutes(post.body)}
-                  tags={post.data.tags}
-                />
-              );
-            })}
+            {groups.get(year)!.map((post) => (
+              <NoteRow
+                no={numbers.get(post.id)!}
+                title={post.data.title}
+                href={`/writing/${post.id}/`}
+                date={post.data.pubDate}
+                minutes={readingMinutes(post.body)}
+                tags={post.data.tags}
+              />
+            ))}
           </div>
         </section>
       ))}
@@ -61,6 +71,15 @@ let counter = 0;
   .top { margin-bottom: var(--s-6); }
   .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
   .top__sub { margin-top: 1.1rem; color: var(--silver-dim); font-size: var(--step-0); line-height: 1.6; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.4rem; }
+  .filters__chip {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+  }
+  .filters__chip:hover { color: var(--signal); border-color: var(--hair-bright); }
 
   .year { margin-bottom: var(--s-5); }
   .year__label {

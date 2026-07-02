@@ -7,6 +7,7 @@ year: 2024
 length: '~10 months'
 order: 1
 glyph: polar
+topics: ['quantum']
 draft: false
 ---
 
