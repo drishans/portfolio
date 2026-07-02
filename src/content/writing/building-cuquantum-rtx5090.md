@@ -3,6 +3,10 @@ title: How far does a single RTX 5090 get you in quantum simulation?
 description: Statevector simulation is a memory problem before it's a compute problem. Here's what 32 GB of consumer GDDR7 and cuQuantum actually buy you.
 pubDate: 2026-05-28
 tags: ['quantum', 'gpu', 'cuda']
+topics: ['quantum', 'scicomp']
+series:
+  id: one-gpu-n-qubits
+  part: 1
 draft: true
 ---
 
