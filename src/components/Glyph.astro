@@ -2,8 +2,10 @@
 // Small instrument diagrams used as plate ornaments — original line drawings in
 // the spirit of an engraved almanac: audio and field-measurement readouts.
 // All stroke currentColor so they inherit whatever accent the context sets.
+import type { GlyphName } from '../consts';
+
 interface Props {
-  name?: 'waveform' | 'spectrum' | 'contour' | 'polar' | 'phases';
+  name?: GlyphName;
   size?: number;
   class?: string;
 }

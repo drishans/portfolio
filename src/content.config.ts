@@ -1,5 +1,8 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, reference, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { GLYPHS, TOPIC_SLUGS } from './consts';
+
+const topics = z.array(z.enum(TOPIC_SLUGS)).default([]);
 
 // "work" = project case studies, presented as numbered plates in the field guide.
 const work = defineCollection({
@@ -22,7 +25,9 @@ const work = defineCollection({
     repo: z.string().url().optional(),
     live: z.string().url().optional(),
     // Which instrument diagram to stamp on the plate card.
-    glyph: z.enum(['waveform', 'spectrum', 'contour', 'polar', 'phases']).optional(),
+    glyph: z.enum(GLYPHS).optional(),
+    // Topic hubs this plate appears on (see TOPICS in consts.ts).
+    topics,
     // Hide from the site without deleting the file.
     draft: z.boolean().default(false),
   }),
@@ -37,8 +42,34 @@ const writing = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
+    // Topic hubs this note appears on (see TOPICS in consts.ts).
+    topics,
+    // Multi-part tutorials: point at a series entry and give this post a part
+    // number. Series navigation and the series page derive from this.
+    series: z
+      .object({ id: reference('series'), part: z.number().int().positive() })
+      .optional(),
     draft: z.boolean().default(false),
   }),
 });
 
-export const collections = { work, writing };
+// "series" = ordered groups of writing entries (tutorial arcs, expeditions).
+// One YAML file per series; posts opt in via their `series` frontmatter field.
+const series = defineCollection({
+  loader: glob({ pattern: '**/*.yaml', base: './src/content/series' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    // Who the series is written for. "intro" = curious with no background,
+    // "working" = took one college course in the topic, "advanced" = beyond.
+    level: z.enum(['intro', 'working', 'advanced']),
+    topics,
+    // The work plate this series grew out of, if any.
+    project: reference('work').optional(),
+    // Free-text "you should already know" lines shown on the series page.
+    prerequisites: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { work, writing, series };

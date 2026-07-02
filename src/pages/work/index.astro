@@ -1,13 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PlateCard from '../../components/PlateCard.astro';
-import { getCollection } from 'astro:content';
-import { byOrder, pad } from '../../utils';
+import { getPublished, byOrder, pad } from '../../utils';
+import { SITE } from '../../consts';
 
-const work = (await getCollection('work', ({ data }) => !data.draft)).sort(byOrder);
+const work = (await getPublished('work')).sort(byOrder);
 ---
 
-<Base title="Work — Drishan" description="Selected projects across quantum computing, AI systems, sound, and low-level engineering.">
+<Base title={`Work — ${SITE.author}`} description="Selected projects across quantum computing, AI systems, sound, and low-level engineering.">
   <section class="section">
     <div class="wrap">
       <header class="top">
@@ -30,6 +30,7 @@ const work = (await getCollection('work', ({ data }) => !data.draft)).sort(byOrd
             stack={p.data.stack}
             glyph={p.data.glyph}
             href={`/work/${p.id}/`}
+            headingLevel="h2"
           />
         ))}
       </div>

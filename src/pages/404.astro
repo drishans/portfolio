@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import { SITE, NAV } from '../consts';
 ---
-<Base title="No signal — Drishan" description="That page isn't on this frequency.">
+<Base title={`No signal — ${SITE.author}`} description="That page isn't on this frequency.">
   <section class="nf">
     <div class="wrap nf__inner">
       <p class="eyebrow">Error 404</p>
@@ -9,8 +10,9 @@ import Base from '../layouts/Base.astro';
       <p class="nf__msg">No signal on this frequency. The page isn't here.</p>
       <div class="nf__links">
         <a href="/" class="link mono">Home →</a>
-        <a href="/work/" class="link mono">Work →</a>
-        <a href="/writing/" class="link mono">Writing →</a>
+        {NAV.map((item) => (
+          <a href={item.href} class="link mono">{item.label} →</a>
+        ))}
       </div>
     </div>
   </section>
@@ -27,7 +29,7 @@ import Base from '../layouts/Base.astro';
     margin-block: 0.4rem;
   }
   .nf__msg { color: var(--silver-dim); font-size: var(--step-1); font-style: italic; }
-  .nf__links { display: flex; gap: 1.6rem; justify-content: center; margin-top: 1.8rem; }
+  .nf__links { display: flex; flex-wrap: wrap; gap: 1.6rem; justify-content: center; margin-top: 1.8rem; }
   .nf__links .link { color: var(--silver-dim); }
   .nf__links .link:hover { color: var(--signal); }
 </style>

@@ -3,17 +3,14 @@ import Base from '../layouts/Base.astro';
 import GrainField from '../components/GrainField.astro';
 import PlateCard from '../components/PlateCard.astro';
 import NoteRow from '../components/NoteRow.astro';
-import { getCollection } from 'astro:content';
-import { byOrder, byDate, readingMinutes, pad } from '../utils';
+import { getPublished, byOrder, byDate, readingMinutes, pad, noteNumbers } from '../utils';
 import { SITE } from '../consts';
 
-const work = (await getCollection('work', ({ data }) => !data.draft))
-  .sort(byOrder)
-  .slice(0, 4);
+const work = (await getPublished('work')).sort(byOrder).slice(0, 4);
 
-const writing = (await getCollection('writing', ({ data }) => !data.draft))
-  .sort(byDate)
-  .slice(0, 4);
+const allWriting = (await getPublished('writing')).sort(byDate);
+const numbers = noteNumbers(allWriting);
+const writing = allWriting.slice(0, 4);
 ---
 
 <Base>
@@ -69,9 +66,9 @@ const writing = (await getCollection('writing', ({ data }) => !data.draft))
       </div>
 
       <div class="notes">
-        {writing.map((post, i) => (
+        {writing.map((post) => (
           <NoteRow
-            no={pad(i + 1)}
+            no={numbers.get(post.id)!}
             title={post.data.title}
             href={`/writing/${post.id}/`}
             date={post.data.pubDate}
