@@ -66,6 +66,7 @@ year: 2026
 length: '3 months'    # optional — shown in the readout as "Length"
 order: 1              # lower number = earlier plate in the field guide
 glyph: waveform       # optional — waveform | spectrum | contour | polar | phases
+topics: ['quantum']   # optional — topic-hub slugs, see TOPICS in src/consts.ts
 repo: https://github.com/...   # optional
 live: https://...              # optional
 draft: false          # set true to hide without deleting
@@ -85,16 +86,33 @@ Create a Markdown file in `src/content/writing/`:
 ---
 title: Post title
 description: One-line summary for the index, RSS, and share cards.
-pubDate: 2026-06-15
+pubDate: 2026-06-15       # when publishing a draft, bump this to the publish date
 updatedDate: 2026-06-20   # optional
-tags: ['quantum', 'gpu']
+tags: ['quantum', 'gpu']  # freeform words shown on the note row
+topics: ['quantum']       # optional — topic-hub slugs, see TOPICS in src/consts.ts
+series:                   # optional — joins a multi-part series
+  id: one-gpu-n-qubits    #   a file in src/content/series/
+  part: 1
 draft: false
 ---
 
-Body in Markdown. Reading time is estimated automatically.
+Body in Markdown. Reading time is estimated automatically. Math renders at
+build time (`$inline$`, `$$display$$`), and code fences get frames — titles
+and line marks via ` ```py title="file.py" {3-4} `. Check the permanent-draft
+`/writing/kitchen-sink` page after changing the rendering stack.
 ```
 
 Field notes are sorted newest-first and grouped by year on the Writing page.
+Their №s are permanent (oldest = №01), which is why a newly published post
+should carry a fresh `pubDate`.
+
+## Adding a series
+
+Tutorial arcs are one YAML file in `src/content/series/` (title, description,
+`level: intro | working | advanced`, `topics`, optional `project:` reference
+to a work plate, `prerequisites`). Posts join it with the `series` frontmatter
+field above; the series page, part navigation, and topic hubs derive from
+that. A series becomes visible once its first part is published.
 
 ---
 
@@ -103,7 +121,7 @@ Field notes are sorted newest-first and grouped by year on the Writing page.
 ```
 src/
 ├── consts.ts            Site metadata, nav, social links — start here
-├── content.config.ts    Frontmatter schemas for work + writing
+├── content.config.ts    Frontmatter schemas for work + writing + series
 ├── utils.ts             Reading-time + sorting helpers
 ├── styles/global.css    The design system (palette, type, prose)
 ├── components/

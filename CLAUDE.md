@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A personal portfolio + blog ("Field guide") built with **Astro 7**. Ships as
-static HTML with **zero client-side framework** by design (the only client JS is
-the WebGL hero in `GrainField.astro`). Node 22+ required. The README is the
+static HTML with **zero client-side framework** by design (the only client JS
+is the WebGL hero in `GrainField.astro` and Expressive Code's tiny copy-button
+script on pages with code fences). Node 22+ required. The README is the
 authoring/deploy guide; this file covers the things you'd otherwise learn only by
 reading several files.
 
@@ -23,42 +24,84 @@ Prettier, Vitest, or `@astrojs/check`. `tsconfig.json` extends Astro's `strict`
 preset, but types are only enforced inside the editor. `npm run build` is the de
 facto check: Astro validates every content file against the schema and fails the
 build on a bad frontmatter field, so build after editing content or schemas.
+After touching the rendering stack (math, code blocks, prose CSS), eyeball
+`/writing/kitchen-sink` — a permanent `draft: true` page that exercises every
+feature; flip its flag locally to view it, never commit the flip.
+
+**Dependencies:** we develop on Windows but Cloudflare builds on Linux. When
+changing deps, edit `package.json` and let `.github/workflows/relock.yml`
+regenerate `package-lock.json` on Linux — never commit a Windows-generated
+lockfile (details in that file's header comment).
 
 ## Architecture
 
 **Content-collection driven.** Pages are generated from Markdown, not
-hand-authored. Two collections defined in `src/content.config.ts`:
+hand-authored. Three collections defined in `src/content.config.ts`:
 
 - `work` — project case studies → rendered as numbered "plates"
-- `writing` — blog posts → "field notes"
+- `writing` — blog posts → "field notes"; a post can join a series via
+  `series: { id, part }` frontmatter
+- `series` — one YAML file per multi-part tutorial arc (title, level,
+  prerequisites, optional `project` reference to a work plate) → pages at
+  `/series/<slug>/`
 
 Adding a `.md` file under `src/content/work/` or `src/content/writing/` adds a
 page. Frontmatter is Zod-validated; the schema is the contract. Dynamic routes
 (`src/pages/work/[...slug].astro`, `writing/[...slug].astro`) use
-`getStaticPaths` → `getCollection` → `render()`, and also compute prev/next
-neighbors there. `rss.xml.js` and the index pages read the same collections.
+`getStaticPaths` → `getPublished()` → `render()`, and also compute prev/next
+neighbors there (series-aware for posts in a series). `rss.xml.js` and the
+index pages read the same collections.
 
-**Draft handling is per-call, not global.** Every place that lists content
-filters with `({ data }) => !data.draft` (the two slug routes, the index pages,
-and `rss.xml.js`). If you add a new listing, replicate that filter or drafts will
-leak.
+**Drafts are filtered in one place.** Query content through `getPublished()`
+from `src/utils.ts` — never raw `getCollection` — and new listings can't leak
+drafts.
 
-**Sorting + numbering live in `src/utils.ts`.** `byOrder` (work: by `order`, then
-recent year), `byDate` (writing: newest first), `pad` (1-based index →
-`"01"`), `readingMinutes` (~200 wpm from raw body). Plate numbers are **derived
-from list position via `pad`**, not stored in frontmatter — reordering is done
-through the `order` field.
+**Topics are the navigation axis.** `TOPICS` in `src/consts.ts` (slug →
+display name) drives the Zod enum, the `/topics/` index, and per-topic hub
+pages that aggregate work + writing + series. A hub only renders once its
+topic has published work or writing, so adding a topic is one line.
 
-**`src/consts.ts` is the single source of truth** for site identity: `SITE`
-(name/title/description/OG), `NAV`, `SOCIAL`. Edit here, not in components.
+**Sorting + numbering live in `src/utils.ts`.** `byOrder` (work: by `order`,
+then recent year), `byDate` (writing: newest first), `pad` (1-based index →
+`"01"`), `noteNumbers` (stable note №s: oldest post = №01 — when publishing a
+draft, set its `pubDate` to the actual publish date; backdating renumbers
+every newer note), `plateNumbers` (one number per plate on every page),
+`readingMinutes` (~200 wpm, code fences excluded),
+`formatDate` (**always UTC** — authored dates parse as UTC midnight, so
+local-timezone formatting would shift them a day between dev and CI). Plate
+numbers are derived from list position via `pad`; reordering is done through
+the `order` field.
+
+**`src/consts.ts` is the single source of truth** for site identity and
+shared enums: `SITE` (name/title/description/OG), `NAV` (also feeds the 404
+page), `SOCIAL`, `TOPICS`, and `GLYPHS` (the glyph tuple — the schema and
+component props derive from it; adding a glyph means drawing the SVG in
+`Glyph.astro` and adding the name there).
+
+**Markdown pipeline** (configured in `astro.config.mjs`): Astro 7's Sätteri
+processor with `math: true` + the plugins in `src/lib/satteri-plugins.mjs`:
+`temmlMath` renders `$…$` / `$$…$$` to build-time MathML via mdast `html`
+nodes (the `rawHtml` escape hatch re-parses as a block and shatters the
+paragraph around inline math — don't switch back), `tableWrap` wraps GFM
+tables in a scroll container. No client JS; the math font (STIX Two Math) and the
+vendored Temml support stylesheet (`src/styles/temml.css`) are imported in
+`BaseHead.astro`.
+Code fences render through `astro-expressive-code` (frames, titles, `{n-m}`
+line marks, copy button — its only client JS), themed to the palette via
+`styleOverrides`. Sätteri is **not** remark/rehype: its plugins use
+`mdastPlugins`/`hastPlugins` with a different API.
 
 ### Single facts that live in two places (keep in sync)
 
 - **Production domain** `https://drishan.com` — set in *both* `astro.config.mjs`
   (`site:`) and `public/robots.txt`. Drives sitemap, RSS, and absolute OG URLs.
-- **The `glyph` enum** — the 5 allowed values (`waveform | spectrum | contour |
-  polar | phases`) are declared in `content.config.ts` (validation) **and** drawn
-  in `src/components/Glyph.astro` (the SVGs). Adding a glyph means editing both.
+- **`theme-color`** in `BaseHead.astro` mirrors `--ink` in `global.css`.
+
+### Permalinks
+
+Published URLs are permanent. Renames get a 301 in `public/_redirects`
+(static rules before dynamic ones), never a deletion. See ROADMAP.md for the
+standing decisions and future passes.
 
 ## The design system
 
