@@ -1,10 +1,10 @@
 ---
 import Project from '../../layouts/Project.astro';
-import { getCollection, render } from 'astro:content';
-import { byOrder } from '../../utils';
+import { render } from 'astro:content';
+import { getPublished, byOrder } from '../../utils';
 
 export async function getStaticPaths() {
-  const items = (await getCollection('work', ({ data }) => !data.draft)).sort(byOrder);
+  const items = (await getPublished('work')).sort(byOrder);
   return items.map((entry, i) => {
     const prevEntry = items[i - 1];
     const nextEntry = items[i + 1];

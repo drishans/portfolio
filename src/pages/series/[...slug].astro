@@ -1,0 +1,139 @@
+---
+import Base from '../../layouts/Base.astro';
+import NoteRow from '../../components/NoteRow.astro';
+import Readout from '../../components/Readout.astro';
+import { getEntry } from 'astro:content';
+import { getPublished, readingMinutes, pad } from '../../utils';
+import { TOPICS } from '../../consts';
+
+const LEVELS = {
+  intro: 'Intro — no background assumed',
+  working: 'Working — one college course in the topic',
+  advanced: 'Advanced — beyond coursework',
+} as const;
+
+export async function getStaticPaths() {
+  const series = await getPublished('series');
+  return series.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+
+const parts = (await getPublished('writing'))
+  .filter((p) => p.data.series?.id.id === entry.id)
+  .sort((a, b) => a.data.series!.part - b.data.series!.part);
+
+const project = d.project ? await getEntry(d.project) : undefined;
+const projectLive = project && !project.data.draft ? project : undefined;
+
+const rows = [
+  { k: 'Level', v: LEVELS[d.level] },
+  { k: 'Parts', v: String(parts.length) },
+  ...(d.topics.length ? [{ k: 'Topics', v: d.topics.map((t) => TOPICS[t]).join(', ') }] : []),
+];
+---
+
+<Base title={`${d.title} — Series`} description={d.description}>
+  <section class="section">
+    <div class="wrap">
+      <a href="/series/" class="back mono">← All series</a>
+
+      <header class="top">
+        <p class="eyebrow">Field series</p>
+        <h1 class="top__title">{d.title}</h1>
+        <p class="top__sub measure">{d.description}</p>
+      </header>
+
+      <div class="grid">
+        <aside class="grid__meta">
+          <Readout rows={rows} />
+          {d.prerequisites.length > 0 && (
+            <div class="prereq">
+              <p class="prereq__label mono">Field conditions</p>
+              <ul class="prereq__list">
+                {d.prerequisites.map((p) => <li>{p}</li>)}
+              </ul>
+            </div>
+          )}
+          {projectLive && (
+            <div class="links">
+              <a class="link mono" href={`/work/${projectLive.id}/`}>Project plate →</a>
+            </div>
+          )}
+        </aside>
+
+        <div class="grid__body">
+          <h2 class="parts__title mono">Parts, in order</h2>
+          <div class="parts">
+            {parts.map((post) => (
+              <NoteRow
+                no={pad(post.data.series!.part)}
+                title={post.data.title}
+                href={`/writing/${post.id}/`}
+                date={post.data.pubDate}
+                minutes={readingMinutes(post.body)}
+                tags={post.data.tags}
+              />
+            ))}
+          </div>
+          {parts.length === 0 && (
+            <p class="empty">No parts published yet.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .back { display: inline-block; color: var(--silver-dim); margin-bottom: var(--s-5); transition: color 0.2s var(--ease); }
+  .back:hover { color: var(--signal); }
+
+  .top { margin-bottom: var(--s-6); }
+  .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
+  .top__sub { margin-top: 1.1rem; color: var(--silver-dim); font-size: var(--step-1); line-height: 1.5; }
+
+  .grid { display: grid; grid-template-columns: 18rem 1fr; gap: var(--s-6); align-items: start; }
+  .grid__meta { position: sticky; top: 84px; }
+
+  .prereq { margin-top: 1.4rem; }
+  .prereq__label { color: var(--mid); letter-spacing: 0.22em; margin-bottom: 0.5rem; }
+  .prereq__list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .prereq__list li {
+    position: relative;
+    padding-left: 1.1rem;
+    color: var(--silver-dim);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+  .prereq__list li::before { content: '·'; position: absolute; left: 0; color: var(--signal); }
+
+  .links { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1.2rem; }
+  .links .link { color: var(--silver-dim); }
+  .links .link:hover { color: var(--signal); }
+
+  .parts__title {
+    color: var(--mid);
+    letter-spacing: 0.22em;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--hair);
+    font-weight: 500;
+    /* neutralize the global heading axes — this is a mono label, not display type */
+    font-variation-settings: normal;
+    font-size: var(--step--2);
+  }
+  .parts { border-bottom: 1px solid var(--hair); }
+  .empty { margin-top: var(--s-4); color: var(--silver-dim); font-style: italic; }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; gap: var(--s-5); }
+    .grid__meta { position: static; }
+  }
+</style>

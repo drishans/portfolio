@@ -1,10 +1,10 @@
 ---
 import Post from '../../layouts/Post.astro';
-import { getCollection, render } from 'astro:content';
-import { byDate, readingMinutes } from '../../utils';
+import { getEntry, render } from 'astro:content';
+import { getPublished, byDate, readingMinutes } from '../../utils';
 
 export async function getStaticPaths() {
-  const posts = (await getCollection('writing', ({ data }) => !data.draft)).sort(byDate);
+  const posts = (await getPublished('writing')).sort(byDate);
   return posts.map((entry, i) => {
     // newest-first list → "previous" (older) is the next index
     const olderEntry = posts[i + 1];
@@ -14,17 +14,51 @@ export async function getStaticPaths() {
       props: {
         entry,
         minutes: readingMinutes(entry.body),
-        prev: olderEntry ? { title: olderEntry.data.title, href: `/writing/${olderEntry.id}/` } : null,
-        next: newerEntry ? { title: newerEntry.data.title, href: `/writing/${newerEntry.id}/` } : null,
+        chronoPrev: olderEntry ? { title: olderEntry.data.title, href: `/writing/${olderEntry.id}/` } : null,
+        chronoNext: newerEntry ? { title: newerEntry.data.title, href: `/writing/${newerEntry.id}/` } : null,
       },
     };
   });
 }
 
-const { entry, minutes, prev, next } = Astro.props;
-const { Content } = await render(entry);
+const { entry, minutes, chronoPrev, chronoNext } = Astro.props;
+const { Content, headings } = await render(entry);
+
+// Series context: when the post belongs to a published series, prev/next walk
+// the series parts instead of the global timeline, and a banner links to the
+// series page.
+let series = null;
+let prev = chronoPrev;
+let next = chronoNext;
+if (entry.data.series) {
+  const s = await getEntry(entry.data.series.id);
+  if (s && !s.data.draft) {
+    const parts = (await getPublished('writing'))
+      .filter((p) => p.data.series?.id.id === s.id)
+      .sort((a, b) => a.data.series!.part - b.data.series!.part);
+    const i = parts.findIndex((p) => p.id === entry.id);
+    series = {
+      title: s.data.title,
+      href: `/series/${s.id}/`,
+      part: entry.data.series.part,
+      // Highest published ordinal, not the published count — parts can ship
+      // out of order and "Part 2 of 1" reads as a bug.
+      total: Math.max(...parts.map((p) => p.data.series!.part)),
+    };
+    const prevPart = i > 0 ? parts[i - 1] : undefined;
+    const nextPart = i >= 0 && i < parts.length - 1 ? parts[i + 1] : undefined;
+    // At the ends of a series, fall back to the chronological neighbor so the
+    // reader never hits a dead end.
+    prev = prevPart
+      ? { title: prevPart.data.title, href: `/writing/${prevPart.id}/`, label: `← Part ${prevPart.data.series!.part}` }
+      : chronoPrev;
+    next = nextPart
+      ? { title: nextPart.data.title, href: `/writing/${nextPart.id}/`, label: `Part ${nextPart.data.series!.part} →` }
+      : chronoNext;
+  }
+}
 ---
 
-<Post entry={entry} minutes={minutes} prev={prev} next={next}>
+<Post entry={entry} minutes={minutes} prev={prev} next={next} headings={headings} series={series}>
   <Content />
 </Post>

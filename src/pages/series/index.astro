@@ -1,0 +1,88 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPublished } from '../../utils';
+import { SITE, TOPICS } from '../../consts';
+
+const LEVELS = { intro: 'Intro', working: 'Working knowledge', advanced: 'Advanced' } as const;
+
+const allSeries = await getPublished('series');
+const writing = await getPublished('writing');
+
+const rows = allSeries
+  .map((s) => ({
+    ...s,
+    parts: writing.filter((p) => p.data.series?.id.id === s.id).length,
+  }))
+  // Series appear once they have at least one published part.
+  .filter((s) => s.parts > 0);
+---
+
+<Base title={`Series — ${SITE.author}`} description="Multi-part tutorial series: ordered field notes that take a topic from setup to something real.">
+  <section class="section">
+    <div class="wrap">
+      <header class="top">
+        <p class="eyebrow">Series</p>
+        <h1 class="top__title">Expeditions</h1>
+        <p class="top__sub measure">
+          Multi-part tutorials, in reading order — each one starts at "what do I
+          install" and ends somewhere worth the walk. Written for readers with
+          about one college course behind them, and tested on my own machine.
+        </p>
+      </header>
+
+      <div class="list">
+        {rows.map((s) => (
+          <a class="card" href={`/series/${s.id}/`}>
+            <span class="card__meta mono">
+              {s.parts} {s.parts === 1 ? 'part' : 'parts'}
+              <span class="card__sep">/</span>
+              {LEVELS[s.data.level]}
+              {s.data.topics.length > 0 && (
+                <><span class="card__sep">/</span>{s.data.topics.map((t) => TOPICS[t]).join(' · ')}</>
+              )}
+            </span>
+            <span class="card__title">{s.data.title}</span>
+            <span class="card__desc">{s.data.description}</span>
+          </a>
+        ))}
+      </div>
+
+      {rows.length === 0 && (
+        <p class="empty">No series yet — the first expedition is being provisioned.</p>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { margin-bottom: var(--s-6); }
+  .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
+  .top__sub { margin-top: 1.1rem; color: var(--silver-dim); font-size: var(--step-0); line-height: 1.6; }
+
+  .list { display: flex; flex-direction: column; gap: var(--s-3); max-width: var(--measure); }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.3rem 1.4rem;
+    background: var(--ink-2);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  }
+  .card:hover { border-color: var(--hair-bright); transform: translateY(-2px); }
+  .card__meta { color: var(--mid); display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .card__sep { color: var(--hair-bright); }
+  .card__title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 60, 'wght' 540, 'SOFT' 0, 'WONK' 0;
+    font-size: var(--step-2);
+    line-height: 1.1;
+    color: var(--silver);
+    transition: color 0.2s var(--ease);
+  }
+  .card:hover .card__title { color: var(--signal); }
+  .card__desc { color: var(--silver-dim); font-size: var(--step-0); line-height: 1.55; }
+
+  .empty { color: var(--silver-dim); font-style: italic; }
+</style>
