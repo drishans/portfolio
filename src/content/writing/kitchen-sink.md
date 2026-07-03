@@ -60,6 +60,13 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 # NVIDIA GeForce RTX 5090, 32607 MiB
 ```
 
+An `ansi` fence (used for annotated error output in tutorials):
+
+```ansi frame="terminal"
+uv add nvidia-cublas-cu13
+# error: Distribution `nvidia-cublas-cu13==0.0.1` can't be installed
+```
+
 Plain inline code like `cp.einsum` should still use the specimen-box style.
 
 ## Tables
