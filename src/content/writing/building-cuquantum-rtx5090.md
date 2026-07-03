@@ -1,8 +1,8 @@
 ---
 title: How far does a single RTX 5090 get you in quantum simulation?
-description: Statevector simulation is a memory problem before it's a compute problem. Here's what 32 GB of consumer GDDR7 and cuQuantum actually buy you.
-pubDate: 2026-05-28
-tags: ['quantum', 'gpu', 'cuda']
+description: Statevector simulation is a memory problem before it's a compute problem. Here's the map — and the surprise I found where the wall was supposed to be.
+pubDate: 2026-07-02
+tags: ['quantum', 'gpu', 'cuda', 'cuquantum']
 topics: ['quantum', 'scicomp']
 series:
   id: one-gpu-n-qubits
@@ -11,72 +11,96 @@ draft: true
 ---
 
 There's a particular kind of fun in pointing expensive consumer hardware at a
-problem it was never marketed for. I have an RTX 5090 that nominally exists for
-games and AI workloads, so the obvious question was: how big a quantum circuit
-can I *actually* simulate on it, on my desk, without touching a cluster?
+problem it was never marketed for. I have an RTX 5090 that nominally exists
+for games and AI workloads, so the obvious question: how big a quantum
+circuit can I *actually* simulate on it, at my desk, without touching a
+cluster?
 
-The answer is more interesting than a single number, because statevector
-simulation hits a wall that has almost nothing to do with how fast the GPU is.
+This series is me finding out, with benchmarks you can rerun — every number
+comes from [this repo](https://github.com/drishans/one-gpu-n-qubits), measured
+on the machine under my desk. The answer turned out to be more interesting
+than the single number I expected, because the wall I went looking for isn't
+where the arithmetic says it should be. More on that at the end.
 
 ## The exponential lives in memory, not in time
 
-A full statevector simulation represents the quantum state of `n` qubits as a
-vector of `2^n` complex amplitudes. Every amplitude is a complex number. That
-vector is the entire game, and it doubles in size with every qubit you add.
+A statevector simulator is the bluntest possible instrument: store the entire
+quantum state, apply every gate as a small matrix multiplied into it. The
+state of $n$ qubits is a vector of $2^n$ complex amplitudes,
 
-In double precision (complex128, 16 bytes per amplitude):
+$$
+|\psi\rangle = \sum_{i=0}^{2^n - 1} \alpha_i \, |i\rangle,
+\qquad \sum_i |\alpha_i|^2 = 1,
+$$
 
-- 28 qubits → ~4.3 GB
-- 29 qubits → ~8.6 GB
-- 30 qubits → ~17.2 GB
-- 31 qubits → ~34.4 GB
+and that vector is the whole game. It doubles with every qubit you add. In
+double precision — `complex128`, 16 bytes per amplitude — the ladder looks
+like this:
 
-The 5090 has 32 GB of GDDR7. So before you've thought about gate speed at all,
-the memory math has already decided your ceiling: right around **30 qubits** in
-double precision, with a little headroom for workspace. Drop to single precision
-and you buy roughly one more qubit. That's it. One qubit costs a doubling, and no
-amount of GPU horsepower changes the size of the vector you have to store.
+| Qubits | Amplitudes | State size |
+| -----: | ---------: | ---------: |
+|     20 |      ~10⁶  |     16 MiB |
+|     26 |      ~10⁸  |      1 GiB |
+|     28 |     ~10⁸·⁵ |      4 GiB |
+|     30 |      ~10⁹  |     16 GiB |
+|     31 |     ~10⁹·³ |     32 GiB |
+|     33 |      ~10¹⁰ |    128 GiB |
+|     40 |      ~10¹² |     16 TiB |
 
-This is the thing people miss about statevector methods: the GPU isn't slow, the
-state is just enormous. Compute is what you optimize *after* you've fit the state
-in memory.
+My card reports **31.8 GiB** of usable VRAM (marketing says 32 GB; the
+runtime disagrees by a rounding error and reserves a slice for itself —
+about 30.2 GiB is actually free once CUDA is warm). So before thinking about
+speed at all, the arithmetic hands down a sentence: **30 qubits in fp64**
+fits with headroom, 31 is exactly the size of the card, and each further
+qubit doubles the bill. Drop to single precision and every row shifts one
+qubit to the right.
 
-## Where cuQuantum comes in
+No amount of GPU horsepower changes the size of the vector you have to
+store. Compute is what you optimize *after* the state fits.
 
-NVIDIA's cuQuantum (specifically cuStateVec) is the library that makes the
-on-device math fast once the state fits. Applying a gate is, under the hood, a
-structured pass over that giant amplitude array, and the win is that these passes
-are exactly the kind of memory-bandwidth-bound, massively parallel work a GPU is
-built for. GDDR7 bandwidth on the 5090 is the resource that actually gets spent
-per gate.
+![State size vs qubit count against the 31.8 GiB VRAM line — rings mark sizes that silently spilled to system RAM, × marks failed allocations](../../assets/figures/one-gpu-n-qubits/memory-wall.svg)
 
-The practical takeaway: once you're GPU-resident, your runtime is dominated by
-how many times you have to stream the whole statevector through memory — which
-means circuit *depth* and gate locality matter as much as qubit count.
+## Why a gate is a memory operation
 
-## What I measured
+Here's the part that makes GPUs the right tool and also caps what they can
+do. Applying a 1-qubit gate $U$ to qubit $k$ pairs up amplitudes whose
+indices differ in bit $k$ and hits each pair with a 2×2 matrix:
 
-{This is where your numbers go. Run a benchmark sweep — e.g. a layered random
-circuit or a QFT — across 24–30 qubits and record per-gate or per-layer timing in
-both fp32 and fp64. A small table here of "qubits vs. wall-clock per layer" is the
-whole point of the post and the thing readers will remember.}
+$$
+\begin{pmatrix} \alpha_i' \\ \alpha_j' \end{pmatrix}
+=
+\begin{pmatrix} u_{00} & u_{01} \\ u_{10} & u_{11} \end{pmatrix}
+\begin{pmatrix} \alpha_i \\ \alpha_j \end{pmatrix},
+\qquad j = i \oplus 2^k .
+$$
 
-A few things worth calling out once you have the data:
+Four multiplies and two adds per pair — trivial math — but the pairs cover
+the **entire statevector**. Every gate reads and writes all $2^n$ amplitudes.
+At 30 qubits that's 16 GiB read + 16 GiB written *per gate*. The work is
+almost pure memory traffic, which is exactly the regime a 5090 was built for:
+GDDR7 moves roughly 1.7 TiB/s, an order of magnitude beyond any CPU socket
+I'll ever own. Part 3 measures how close cuStateVec gets to that ceiling.
 
-- The jump from "fits in VRAM" to "doesn't" is a cliff, not a slope. 30 qubits
-  runs; 31 falls off the edge into host memory and the performance collapses.
-- fp32 vs fp64 isn't just a memory trade — bandwidth-bound kernels move half the
-  bytes, so single precision can be meaningfully faster, if your circuit tolerates
-  the reduced precision.
+## What the series covers
 
-## Why this is worth doing on consumer hardware
+- **Part 2** — getting the stack alive on Windows via WSL2: the wheels, the
+  three errors you'll hit, and a Bell state as proof of life.
+- **Part 3** — real circuits and the scaling data: what a gate costs from 24
+  to 30 qubits, fp32 vs fp64, and why gate *locality* shows up in the
+  timings.
+- **Part 4** — the wall itself. This is where the plot twisted.
+- **Part 5** — tensor networks: simulating circuits the statevector can't
+  hold, and the different wall you buy instead.
 
-Not because you're going to out-simulate a supercomputer — you're capped at ~30
-qubits and that's a hard cap. It's worth doing because that 30-qubit envelope
-covers an enormous amount of real algorithm development, debugging, and intuition
-building, and you can do all of it on a machine you already own, with a fast
-iteration loop and no queue.
+## The spoiler, because field notes should be honest
 
-The frontier of quantum *advantage* is past where any classical simulator can
-follow. But the frontier of quantum *learning* fits comfortably on a desk, and
-the same GPU that trains your models will happily run your circuits between jobs.
+I expected the experiment at 31 qubits to end with CUDA's version of a shrug
+— `OutOfMemoryError`, series over, wall found. That is not what happened. On
+a current driver, the allocation *succeeded*, the free-VRAM counter pinned
+to zero, and the gate quietly took orders of magnitude longer. The modern
+"wall" is soft: the driver spills your statevector into system RAM behind
+your back and lets performance absorb the damage.
+
+Which means the real question isn't "how many qubits fit" — it's "how many
+qubits fit *before the cliff*, where's the cliff, and how steep is it".
+Those are measurable questions. Let's measure them.
