@@ -7,10 +7,10 @@ topics: ['quantum', 'scicomp']
 series:
   id: one-gpu-n-qubits
   part: 1
-draft: true
+draft: false
 ---
 
-There's a particular kind of fun in pointing expensive consumer hardware at a
+There's a particular kind of fun in leveraging consumer hardware for a
 problem it was never marketed for. I have an RTX 5090 that nominally exists
 for games and AI workloads, so the obvious question: how big a quantum
 circuit can I *actually* simulate on it, at my desk, without touching a
@@ -34,7 +34,7 @@ $$
 $$
 
 and that vector is the whole game. It doubles with every qubit you add. In
-double precision — `complex128`, 16 bytes per amplitude — the ladder looks
+double precision -- `complex128`, 16 bytes per amplitude. The ladder looks
 like this:
 
 | Qubits | Amplitudes | State size |
@@ -48,17 +48,17 @@ like this:
 |     40 |      ~10¹² |     16 TiB |
 
 My card reports **31.8 GiB** of usable VRAM (marketing says 32 GB; the
-runtime disagrees by a rounding error and reserves a slice for itself —
+runtime disagrees by a rounding error and reserves a slice for itself,
 about 30.2 GiB is actually free once CUDA is warm). So before thinking about
 speed at all, the arithmetic hands down a sentence: **30 qubits in fp64**
 fits with headroom, 31 is exactly the size of the card, and each further
 qubit doubles the bill. Drop to single precision and every row shifts one
 qubit to the right.
 
-No amount of GPU horsepower changes the size of the vector you have to
+No amount of GPU compute changes the size of the vector you have to
 store. Compute is what you optimize *after* the state fits.
 
-![State size vs qubit count against the 31.8 GiB VRAM line — rings mark sizes that silently spilled to system RAM, × marks failed allocations](../../assets/figures/one-gpu-n-qubits/memory-wall.svg)
+![State size vs qubit count against the 31.8 GiB VRAM line. Rings mark sizes that silently spilled to system RAM, × marks failed allocations](../../assets/figures/one-gpu-n-qubits/memory-wall.svg)
 
 ## Why a gate is a memory operation
 
@@ -74,7 +74,7 @@ $$
 \qquad j = i \oplus 2^k .
 $$
 
-Four multiplies and two adds per pair — trivial math — but the pairs cover
+Four multiplies and two adds per pair (trivial math) but the pairs cover
 the **entire statevector**. Every gate reads and writes all $2^n$ amplitudes.
 At 30 qubits that's 16 GiB read + 16 GiB written *per gate*. The work is
 almost pure memory traffic, which is exactly the regime a 5090 was built for:
@@ -101,6 +101,6 @@ to zero, and the gate quietly took orders of magnitude longer. The modern
 "wall" is soft: the driver spills your statevector into system RAM behind
 your back and lets performance absorb the damage.
 
-Which means the real question isn't "how many qubits fit" — it's "how many
+Which means the real question isn't "how many qubits fit." It's "how many
 qubits fit *before the cliff*, where's the cliff, and how steep is it".
 Those are measurable questions. Let's measure them.
