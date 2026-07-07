@@ -1,0 +1,124 @@
+---
+/**
+ * The landing between the field guide and the two quiet rooms. Deliberately
+ * a page, not a dropdown: it works identically on touch, costs no JS, and
+ * gives the galleries a front door on the main domain.
+ */
+import Base from '../layouts/Base.astro';
+import Glyph from '../components/Glyph.astro';
+
+const rooms = [
+  {
+    href: 'https://photos.drishan.com',
+    domain: 'photos.drishan.com',
+    glyph: 'contour' as const,
+    name: 'Photographs',
+    body: 'Frames from a Leica and wherever it was pointed. A grid, a slideshow, the camera settings, and nothing else on the wall.',
+  },
+  {
+    href: 'https://audio.drishan.com',
+    domain: 'audio.drishan.com',
+    glyph: 'waveform' as const,
+    name: 'Sound',
+    body: 'Field recordings and sounds built from physics — instruments simulated, not sampled. Each piece names the DSP that made it.',
+  },
+];
+---
+
+<Base
+  title="Gallery"
+  description="The two quiet rooms next to the field guide: photographs at photos.drishan.com, sound at audio.drishan.com."
+>
+  <section class="section">
+    <div class="wrap">
+      <header class="top">
+        <p class="eyebrow">Gallery</p>
+        <h1 class="top__title">Two quiet rooms</h1>
+        <p class="top__lede prose">
+          The work here is meant to be looked at and listened to, not read about
+          — so it hangs off the main site, in rooms with almost nothing on the
+          walls but the work.
+        </p>
+      </header>
+
+      <div class="rooms">
+        {rooms.map((r) => (
+          <a class="room" href={r.href}>
+            <div class="room__glyph"><Glyph name={r.glyph} size={64} /></div>
+            <h2 class="room__name">{r.name}</h2>
+            <p class="room__body">{r.body}</p>
+            <span class="room__domain mono">{r.domain} ↗</span>
+          </a>
+        ))}
+      </div>
+
+      <p class="colophon">
+        The making-of lives here on the field guide — pieces link back to
+        <a href="/writing/">the notes</a> that explain their own physics.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { margin-bottom: var(--s-6); }
+  .top__title { font-size: var(--step-4); margin-top: 0.4rem; }
+  .top__lede {
+    margin-top: 1rem;
+    max-width: 52ch;
+    color: var(--silver-dim);
+  }
+
+  .rooms {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+  }
+  @media (min-width: 720px) { .rooms { grid-template-columns: 1fr 1fr; } }
+
+  .room {
+    display: block;
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    background: var(--ink-2);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .room:hover {
+    border-color: var(--signal);
+    transform: translateY(-2px);
+  }
+  .room__glyph { color: var(--signal); margin-bottom: 1.1rem; }
+  .room__name {
+    font-size: var(--step-2);
+    font-variation-settings: 'opsz' 48, 'wght' 560, 'SOFT' 0, 'WONK' 0;
+    color: var(--silver);
+  }
+  .room__body {
+    margin-top: 0.6rem;
+    color: var(--silver-dim);
+    font-size: var(--step--1);
+    line-height: 1.6;
+    max-width: 44ch;
+  }
+  .room__domain {
+    display: inline-block;
+    margin-top: 1.2rem;
+    color: var(--mid);
+    transition: color 0.2s var(--ease);
+  }
+  .room:hover .room__domain { color: var(--signal); }
+
+  .colophon {
+    margin-top: var(--s-6);
+    color: var(--mid);
+    font-size: var(--step--1);
+    font-style: italic;
+  }
+  .colophon a {
+    color: var(--silver-dim);
+    text-underline-offset: 3px;
+  }
+  .colophon a:hover { color: var(--signal); }
+</style>
