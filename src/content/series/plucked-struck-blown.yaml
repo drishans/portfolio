@@ -1,8 +1,8 @@
 # A series is one YAML file; posts join it via their `series` frontmatter field.
 title: Plucked, Struck, Blown
 description: >-
-  Three musical instruments built from physics instead of samples — a wire, a
-  bar, and a pipe in ~60 lines of Faust each — compiled to WebAssembly small
+  Three musical instruments built from physics instead of samples: a wire, a
+  bar, and a pipe in ~60 lines of Faust each, compiled to WebAssembly small
   enough to hand to a browser, then reverse-engineered by gradient descent.
   Every number measured, every sound reproducible.
 level: working

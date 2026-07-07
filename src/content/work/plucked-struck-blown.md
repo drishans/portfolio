@@ -25,8 +25,8 @@ object.
 **The measurements.** The bar's designed decay times are recovered to three
 significant figures from its own renders ($t_{60}$ 10.00 s designed, 10.02 s
 measured). The pipe refused its written pitch until a two-parameter grid
-search revealed the loop speaks on its m = 1 odd mode at $3\,\mathrm{SR}/2D$
-— which turns out to be exactly the uncommented `0.66666` in STK's flute,
+search revealed the loop speaks on its m = 1 odd mode at $3\,\mathrm{SR}/2D$,
+which turns out to be exactly the uncommented `0.66666` in STK's flute,
 measured rather than inherited.
 
 **One source, two stages.** The same `.dsp` files feed an offline Node
@@ -36,8 +36,8 @@ workbench (precompiled WASM in an `AudioWorklet`, ~9 KB per instrument,
 sliders generated from the compiler's own parameter metadata). Six pieces
 rendered this way hang in the [sound gallery](https://audio.drishan.com).
 
-**The capstone.** A differentiable copy of the modal bar — a bank of damped
-sinusoids under a multiscale spectral loss — is fitted to recordings by
+**The capstone.** A differentiable copy of the modal bar, a bank of damped
+sinusoids under a multiscale spectral loss, is fitted to recordings by
 running thousands of random initializations in parallel on the GPU and
 letting the best survivors refine. Against the bar's answer key the fit
 recovers mode frequencies to within a few cents; pointed at the *string*, a
