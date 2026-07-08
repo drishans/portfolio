@@ -1,13 +1,13 @@
 ---
 title: "The WSL2 field manual: cuQuantum on a Windows box"
 description: The driver lives on Windows, the math lives in Linux, and pip carries everything in between. A three-layer mental model, a four-rung verification ladder, and a Bell state to prove the stack is real.
-pubDate: 2026-07-02
+pubDate: 2026-07-06
 tags: ['quantum', 'cuda', 'wsl2', 'setup']
 topics: ['quantum', 'scicomp']
 series:
   id: one-gpu-n-qubits
   part: 2
-draft: true
+draft: false
 ---
 
 Part 1 established the plan: statevector simulation on the 5090, measured
