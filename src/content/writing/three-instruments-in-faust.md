@@ -27,6 +27,15 @@ your browser (part 2), six pieces performed on them hang in the
 to one and reverse-engineer it. Everything below is measured, not asserted;
 the measurement scripts are committed next to the instruments.
 
+Better than reading about them: play them. The workbench below is the
+actual instruments, compiled to nine kilobytes of WebAssembly each
+(part 2 explains how), running live in your tab once you press power.
+
+<psb-workbench class="widget">
+  <p><em>The playable workbench needs JavaScript. Without it, the pieces
+  in the gallery are the same instruments, recorded.</em></p>
+</psb-workbench>
+
 ## The wire: Karplus–Strong, taken seriously
 
 The 1983 Karplus–Strong algorithm is the "hello world" of physical modeling:
