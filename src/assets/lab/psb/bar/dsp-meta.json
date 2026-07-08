@@ -1,0 +1,297 @@
+{
+    "name": "bar",
+    "filename": "bar",
+    "version": "2.85.8",
+    "compile_options": "-lang wasm-i -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
+    "library_list": [
+        "/usr/share/faust/stdfaust.lib",
+        "/usr/share/faust/maths.lib",
+        "/usr/share/faust/platform.lib",
+        "/usr/share/faust/noises.lib",
+        "/usr/share/faust/physmodels.lib",
+        "/usr/share/faust/basics.lib",
+        "/usr/share/faust/filters.lib"
+    ],
+    "include_pathnames": [
+        "/faust/user/inc0",
+        "/share/faust",
+        "/usr/local/share/faust",
+        "/usr/share/faust",
+        "."
+    ],
+    "size": 200,
+    "code": "eG0hAWRKHw==",
+    "inputs": 0,
+    "outputs": 1,
+    "meta": [
+        {
+            "author": "Drishan Sarkar"
+        },
+        {
+            "basics.lib/name": "Faust Basic Element Library"
+        },
+        {
+            "basics.lib/version": "1.22.0"
+        },
+        {
+            "compile_options": "-lang wasm-i -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
+        },
+        {
+            "description": "Struck: modal synthesis of a free-free metal bar. Nine modes at measured free-free ratios (Fletcher & Rossing), each an exponentially decaying resonator. Strike position weights the modes by where their node lines fall; strike hardness sets the contact time of a raised-cosine force pulse, which is what actually filters the top modes out of a soft mallet."
+        },
+        {
+            "filename": "bar"
+        },
+        {
+            "filters.lib/dcblocker:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/dcblocker:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/dcblocker:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/fir:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/fir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/fir:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/iir:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/iir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/iir:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/name": "Faust Filters Library"
+        },
+        {
+            "filters.lib/pole:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/pole:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/pole:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/tf2:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/tf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/tf2:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/version": "1.7.1"
+        },
+        {
+            "filters.lib/zero:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/zero:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/zero:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "license": "MIT"
+        },
+        {
+            "maths.lib/author": "GRAME"
+        },
+        {
+            "maths.lib/copyright": "GRAME"
+        },
+        {
+            "maths.lib/license": "LGPL with exception"
+        },
+        {
+            "maths.lib/name": "Faust Math Library"
+        },
+        {
+            "maths.lib/version": "2.9.0"
+        },
+        {
+            "name": "bar"
+        },
+        {
+            "noises.lib/name": "Faust Noise Generator Library"
+        },
+        {
+            "noises.lib/version": "1.5.0"
+        },
+        {
+            "physmodels.lib/name": "Faust Physical Models Library"
+        },
+        {
+            "physmodels.lib/version": "1.2.0"
+        },
+        {
+            "platform.lib/name": "Generic Platform Library"
+        },
+        {
+            "platform.lib/version": "1.3.0"
+        }
+    ],
+    "ui": [
+        {
+            "type": "vgroup",
+            "label": "bar",
+            "items": [
+                {
+                    "type": "hslider",
+                    "label": "freq",
+                    "varname": "fHslider2",
+                    "shortname": "freq",
+                    "address": "/bar/freq",
+                    "index": 8,
+                    "meta": [
+                        {
+                            "0": ""
+                        },
+                        {
+                            "unit": "Hz"
+                        }
+                    ],
+                    "init": 440,
+                    "min": 110,
+                    "max": 2200,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "t60",
+                    "varname": "fHslider5",
+                    "shortname": "t60",
+                    "address": "/bar/t60",
+                    "index": 68,
+                    "meta": [
+                        {
+                            "1": ""
+                        },
+                        {
+                            "unit": "s"
+                        }
+                    ],
+                    "init": 9,
+                    "min": 0.5,
+                    "max": 25,
+                    "step": 0.1
+                },
+                {
+                    "type": "hslider",
+                    "label": "damping_slope",
+                    "varname": "fHslider6",
+                    "shortname": "damping_slope",
+                    "address": "/bar/damping_slope",
+                    "index": 72,
+                    "meta": [
+                        {
+                            "2": ""
+                        }
+                    ],
+                    "init": 0.9,
+                    "min": 0.2,
+                    "max": 2,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "stretch",
+                    "varname": "fHslider3",
+                    "shortname": "stretch",
+                    "address": "/bar/stretch",
+                    "index": 12,
+                    "meta": [
+                        {
+                            "3": ""
+                        }
+                    ],
+                    "init": 1,
+                    "min": 0.9,
+                    "max": 1.1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "strike_position",
+                    "varname": "fHslider1",
+                    "shortname": "strike_position",
+                    "address": "/bar/strike_position",
+                    "index": 4,
+                    "meta": [
+                        {
+                            "4": ""
+                        }
+                    ],
+                    "init": 0.26,
+                    "min": 0.02,
+                    "max": 0.5,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "strike_hardness",
+                    "varname": "fHslider4",
+                    "shortname": "strike_hardness",
+                    "address": "/bar/strike_hardness",
+                    "index": 48,
+                    "meta": [
+                        {
+                            "5": ""
+                        }
+                    ],
+                    "init": 0.6,
+                    "min": 0.05,
+                    "max": 1,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "level",
+                    "varname": "fHslider0",
+                    "shortname": "level",
+                    "address": "/bar/level",
+                    "index": 0,
+                    "meta": [
+                        {
+                            "6": ""
+                        },
+                        {
+                            "unit": "dB"
+                        }
+                    ],
+                    "init": -6,
+                    "min": -24,
+                    "max": 6,
+                    "step": 0.1
+                },
+                {
+                    "type": "button",
+                    "label": "strike",
+                    "varname": "fButton0",
+                    "shortname": "strike",
+                    "address": "/bar/strike",
+                    "index": 28,
+                    "meta": [
+                        {
+                            "7": ""
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
