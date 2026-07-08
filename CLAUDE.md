@@ -126,6 +126,26 @@ Preserve those three fallback paths when editing it.
 wrapped by `Project.astro` (work case-study template) and `Post.astro` (field
 note). The slug routes pass a rendered `<Content />` into those layouts.
 
+## Content workflow and prose style
+
+**Claude scaffolds, Drishan publishes.** Every drafted note, plate, or
+series ships with `draft: true` on a `content/<slug>` branch; Drishan
+rewrites in his own voice and flips the flag himself. Never set
+`draft: false`, never push content to main. The step-by-step workflows
+live in `.claude/skills/` (`draft-note`, `publish-note`) — invoke them.
+
+Prose rules for anything drafted here:
+
+- **Em-dashes: at most one per two or three notes**, only where a
+  reversal earns it. Prefer colons, commas, parentheses, or a sentence
+  split. Overuse reads as generated text.
+- **Timeless over topical.** Build notes around models, methods, and
+  measurements that survive version churn; version-specific breakage gets
+  one short, explicitly dated section that ends with the general recipe
+  for re-deriving the fix.
+- **No invented numbers.** Every figure traces to a committed script
+  output or provenance sidecar in a project repo.
+
 ## Commit conventions
 
 Use Conventional Commits: `type(scope): summary`
