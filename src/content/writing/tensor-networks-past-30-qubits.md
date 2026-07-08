@@ -7,7 +7,7 @@ topics: ['quantum', 'scicomp']
 series:
   id: one-gpu-n-qubits
   part: 5
-draft: true
+draft: false
 ---
 
 Four parts of this series treated one assumption as physics: to simulate

@@ -1,13 +1,13 @@
 ---
 title: "The soft wall: what happens past 32 GiB"
 description: The driver doesn't say no anymore; it quietly pages your statevector over PCIe. Measuring the cliff, and why the official offload tool loses to the automatic one.
-pubDate: 2026-07-02
+pubDate: 2026-07-08
 tags: ['quantum', 'gpu', 'cuda', 'memory']
 topics: ['quantum', 'scicomp']
 series:
   id: one-gpu-n-qubits
   part: 4
-draft: true
+draft: false
 ---
 
 Part 1's arithmetic was unambiguous: at 31 qubits in fp64 the statevector is
