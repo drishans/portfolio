@@ -31,7 +31,7 @@ const relatedSeries = (await getPublished('series')).filter(
 );
 ---
 
-<Base title={`${d.title} — Work`} description={d.summary} type="article">
+<Base title={`${d.title} — Work`} description={d.summary} type="article" image={`/og/work/${entry.id}.png`} imageAlt={`Work plate: ${d.title}`}>
   <article class="section">
     <div class="wrap">
       <a href="/work/" class="back mono">← All plates</a>

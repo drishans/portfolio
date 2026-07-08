@@ -7,11 +7,12 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   type?: 'website' | 'article';
   publishedTime?: Date;
   modifiedTime?: Date;
 }
-const { title, description, image, type, publishedTime, modifiedTime } = Astro.props;
+const { title, description, image, imageAlt, type, publishedTime, modifiedTime } = Astro.props;
 ---
 
 <!doctype html>
@@ -21,6 +22,7 @@ const { title, description, image, type, publishedTime, modifiedTime } = Astro.p
       title={title}
       description={description}
       image={image}
+      imageAlt={imageAlt}
       type={type}
       publishedTime={publishedTime}
       modifiedTime={modifiedTime}
