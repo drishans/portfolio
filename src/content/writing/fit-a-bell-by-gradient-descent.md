@@ -1,13 +1,13 @@
 ---
 title: Fitting a bell with four thousand guesses
 description: "The capstone: a differentiable copy of the modal bar, a loss that had to be taught to hear decay, and a GPU running thousands of random initializations in parallel until one of them finds the physics."
-pubDate: 2026-07-05
+pubDate: 2026-07-09
 tags: ['audio', 'ai', 'pytorch', 'cuda', 'dsp', 'optimization']
 topics: ['audio', 'ai', 'scicomp']
 series:
   id: plucked-struck-blown
   part: 3
-draft: true
+draft: false
 ---
 
 Part 1 built [a bar out of nine damped resonators](/writing/three-instruments-in-faust)

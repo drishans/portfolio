@@ -1,13 +1,13 @@
 ---
 title: Three instruments in sixty lines each
 description: A plucked wire, a struck bar, and a blown pipe, built from physics instead of samples. Including the afternoon the pipe refused to play the note I asked for, and the measurement that explained a famous magic constant.
-pubDate: 2026-07-03
+pubDate: 2026-07-09
 tags: ['audio', 'dsp', 'faust', 'physical-modeling']
 topics: ['audio']
 series:
   id: plucked-struck-blown
   part: 1
-draft: true
+draft: false
 ---
 
 There are two ways to make a computer sound like an instrument. You can record

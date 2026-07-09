@@ -1,13 +1,13 @@
 ---
 title: The whole instrument is nine kilobytes
 description: "One Faust source, two consumers: an offline renderer that performs the gallery pieces in Node, and an AudioWorklet build small enough to embed three instruments in a blog post with room to spare."
-pubDate: 2026-07-04
+pubDate: 2026-07-09
 tags: ['audio', 'wasm', 'faust', 'webaudio', 'audioworklet']
 topics: ['audio', 'scicomp']
 series:
   id: plucked-struck-blown
   part: 2
-draft: true
+draft: false
 ---
 
 Part 1 built three instruments in [Faust](https://faust.grame.fr): a

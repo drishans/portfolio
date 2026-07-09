@@ -4,11 +4,10 @@ description: >-
   Three musical instruments built from physics instead of samples: a wire, a
   bar, and a pipe in ~60 lines of Faust each, compiled to WebAssembly small
   enough to hand to a browser, then reverse-engineered by gradient descent.
-  Every number measured, every sound reproducible.
 level: working
 topics: ['audio', 'scicomp']
 prerequisites:
   - What a filter and a delay line are, roughly
   - Comfort reading short DSP code (the Faust is explained inline)
   - A browser; a GPU only for the final part
-draft: true
+draft: false
