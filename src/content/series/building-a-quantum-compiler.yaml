@@ -1,0 +1,15 @@
+# A series is one YAML file; posts join it via their `series` frontmatter field.
+title: Building a Quantum Compiler
+description: >-
+  A small optimizing compiler for quantum circuits, built from the IR up:
+  OpenQASM 3 in, optimized QIR out, executed on CUDA-Q, and measured against
+  the Qiskit and pytket transpilers. Where the gates go, and why the data
+  structure is the whole trick.
+level: working
+topics: ['compilers', 'quantum']
+project: qcc
+prerequisites:
+  - 'What a quantum circuit is: qubits, gates, measurement'
+  - Reading Python; no compiler background assumed, part 1 builds it up
+  - A GPU only if you want to run the CUDA-Q backend in part 4
+draft: true
