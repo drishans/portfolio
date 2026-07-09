@@ -104,3 +104,14 @@ problem[^memory], which is the whole reason this series exists.
    - And a sibling
 
 That's the whole bench. If it all looks right, ship the real thing.
+
+## Widget runtime
+
+An interactive widget as a bare custom element. Before its chunk loads (or
+without JavaScript) the fallback child renders; in view, the runtime
+upgrades it. Audio starts only behind the power button.
+
+<psb-workbench class="widget">
+  <p><em>The playable workbench needs JavaScript; the fallback is this
+  sentence.</em></p>
+</psb-workbench>

@@ -189,3 +189,31 @@ const showToc = toc.length >= 4;
     .pn__item--next { text-align: left; align-items: flex-start; }
   }
 </style>
+
+<script>
+  // Widget runtime (ROADMAP Pass 5): custom elements written directly in
+  // Markdown upgrade lazily — IntersectionObserver -> dynamic import ->
+  // customElements.define. Each widget is its own hashed chunk; pages
+  // without widgets pay only this scan.
+  const REGISTRY: Record<string, () => Promise<{ define: () => void }>> = {
+    'psb-workbench': () => import('../lab/psb-workbench.js'),
+  };
+  const present = document.querySelectorAll(Object.keys(REGISTRY).join(','));
+  if (present.length) {
+    const seen = new Set<string>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const tag = e.target.tagName.toLowerCase();
+          io.unobserve(e.target);
+          if (seen.has(tag)) continue;
+          seen.add(tag);
+          REGISTRY[tag]().then((m) => m.define());
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    present.forEach((el) => io.observe(el));
+  }
+</script>

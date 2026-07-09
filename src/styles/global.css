@@ -329,3 +329,8 @@ math[display='block'] {
   overflow-x: auto;
   overflow-y: hidden;
 }
+
+/* Interactive-figure widgets (ROADMAP Pass 5): custom elements in Markdown
+   default to display:inline with a zero box before they upgrade, which
+   starves IntersectionObserver of geometry. Every widget carries .widget. */
+.widget { display: block; }

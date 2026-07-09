@@ -1,0 +1,366 @@
+{
+    "name": "pipe",
+    "filename": "pipe",
+    "version": "2.85.8",
+    "compile_options": "-lang wasm-i -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
+    "library_list": [
+        "/usr/share/faust/stdfaust.lib",
+        "/usr/share/faust/filters.lib",
+        "/usr/share/faust/basics.lib",
+        "/usr/share/faust/delays.lib",
+        "/usr/share/faust/signals.lib",
+        "/usr/share/faust/maths.lib",
+        "/usr/share/faust/platform.lib",
+        "/usr/share/faust/envelopes.lib",
+        "/usr/share/faust/oscillators.lib",
+        "/usr/share/faust/noises.lib"
+    ],
+    "include_pathnames": [
+        "/faust/user/inc0",
+        "/share/faust",
+        "/usr/local/share/faust",
+        "/usr/share/faust",
+        "."
+    ],
+    "size": 327892,
+    "code": "iCcqAWRKHw==",
+    "inputs": 0,
+    "outputs": 1,
+    "meta": [
+        {
+            "author": "Drishan Sarkar"
+        },
+        {
+            "basics.lib/name": "Faust Basic Element Library"
+        },
+        {
+            "basics.lib/version": "1.22.0"
+        },
+        {
+            "compile_options": "-lang wasm-i -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
+        },
+        {
+            "delays.lib/fdelay4:author": "Julius O. Smith III"
+        },
+        {
+            "delays.lib/fdelayltv:author": "Julius O. Smith III"
+        },
+        {
+            "delays.lib/name": "Faust Delay Library"
+        },
+        {
+            "delays.lib/version": "1.2.0"
+        },
+        {
+            "description": "Blown: a slide-flute waveguide after Cook-s STK flute. Breath pressure drives a jet delay (half the bore) into a cubic jet nonlinearity x(x^2-1); the bore is a delay loop closed by an inverting one-pole reflection filter, as at an open pipe end. Pitch is whatever frequency the loop decides to oscillate at, which is why the bore length carries an empirical correction."
+        },
+        {
+            "envelopes.lib/asr:author": "Yann Orlarey, Stéphane Letz"
+        },
+        {
+            "envelopes.lib/author": "GRAME"
+        },
+        {
+            "envelopes.lib/copyright": "GRAME"
+        },
+        {
+            "envelopes.lib/license": "LGPL with exception"
+        },
+        {
+            "envelopes.lib/name": "Faust Envelope Library"
+        },
+        {
+            "envelopes.lib/version": "1.3.0"
+        },
+        {
+            "filename": "pipe"
+        },
+        {
+            "filters.lib/dcblocker:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/dcblocker:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/dcblocker:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/lowpass0_highpass1": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/name": "Faust Filters Library"
+        },
+        {
+            "filters.lib/pole:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/pole:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/pole:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/version": "1.7.1"
+        },
+        {
+            "filters.lib/zero:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/zero:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/zero:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "license": "MIT"
+        },
+        {
+            "maths.lib/author": "GRAME"
+        },
+        {
+            "maths.lib/copyright": "GRAME"
+        },
+        {
+            "maths.lib/license": "LGPL with exception"
+        },
+        {
+            "maths.lib/name": "Faust Math Library"
+        },
+        {
+            "maths.lib/version": "2.9.0"
+        },
+        {
+            "name": "pipe"
+        },
+        {
+            "noises.lib/name": "Faust Noise Generator Library"
+        },
+        {
+            "noises.lib/version": "1.5.0"
+        },
+        {
+            "oscillators.lib/name": "Faust Oscillator Library"
+        },
+        {
+            "oscillators.lib/version": "1.7.0"
+        },
+        {
+            "platform.lib/name": "Generic Platform Library"
+        },
+        {
+            "platform.lib/version": "1.3.0"
+        },
+        {
+            "signals.lib/name": "Faust Routing Library"
+        },
+        {
+            "signals.lib/version": "1.6.0"
+        }
+    ],
+    "ui": [
+        {
+            "type": "vgroup",
+            "label": "pipe",
+            "items": [
+                {
+                    "type": "hslider",
+                    "label": "freq",
+                    "varname": "fHslider2",
+                    "shortname": "freq",
+                    "address": "/pipe/freq",
+                    "index": 262164,
+                    "meta": [
+                        {
+                            "0": ""
+                        },
+                        {
+                            "unit": "Hz"
+                        }
+                    ],
+                    "init": 440,
+                    "min": 262,
+                    "max": 1568,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "jet_ratio",
+                    "varname": "fHslider4",
+                    "shortname": "jet_ratio",
+                    "address": "/pipe/jet_ratio",
+                    "index": 262220,
+                    "meta": [
+                        {
+                            "10": ""
+                        }
+                    ],
+                    "init": 0.333,
+                    "min": 0.15,
+                    "max": 0.8,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "breath",
+                    "varname": "fHslider5",
+                    "shortname": "breath",
+                    "address": "/pipe/breath",
+                    "index": 262224,
+                    "meta": [
+                        {
+                            "1": ""
+                        }
+                    ],
+                    "init": 1.1,
+                    "min": 0,
+                    "max": 1.35,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "breath_noise",
+                    "varname": "fHslider9",
+                    "shortname": "breath_noise",
+                    "address": "/pipe/breath_noise",
+                    "index": 262308,
+                    "meta": [
+                        {
+                            "2": ""
+                        }
+                    ],
+                    "init": 0.05,
+                    "min": 0,
+                    "max": 0.25,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "vibrato_rate",
+                    "varname": "fHslider8",
+                    "shortname": "vibrato_rate",
+                    "address": "/pipe/vibrato_rate",
+                    "index": 262296,
+                    "meta": [
+                        {
+                            "3": ""
+                        },
+                        {
+                            "unit": "Hz"
+                        }
+                    ],
+                    "init": 4.4,
+                    "min": 0,
+                    "max": 8,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "vibrato_depth",
+                    "varname": "fHslider7",
+                    "shortname": "vibrato_depth",
+                    "address": "/pipe/vibrato_depth",
+                    "index": 262280,
+                    "meta": [
+                        {
+                            "4": ""
+                        }
+                    ],
+                    "init": 0.015,
+                    "min": 0,
+                    "max": 0.05,
+                    "step": 0.0001
+                },
+                {
+                    "type": "hslider",
+                    "label": "attack",
+                    "varname": "fHslider6",
+                    "shortname": "attack",
+                    "address": "/pipe/attack",
+                    "index": 262236,
+                    "meta": [
+                        {
+                            "5": ""
+                        },
+                        {
+                            "unit": "s"
+                        }
+                    ],
+                    "init": 0.08,
+                    "min": 0.005,
+                    "max": 0.6,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "level",
+                    "varname": "fHslider0",
+                    "shortname": "level",
+                    "address": "/pipe/level",
+                    "index": 262144,
+                    "meta": [
+                        {
+                            "6": ""
+                        },
+                        {
+                            "unit": "dB"
+                        }
+                    ],
+                    "init": -6,
+                    "min": -24,
+                    "max": 6,
+                    "step": 0.1
+                },
+                {
+                    "type": "button",
+                    "label": "blow",
+                    "varname": "fButton0",
+                    "shortname": "blow",
+                    "address": "/pipe/blow",
+                    "index": 262240,
+                    "meta": [
+                        {
+                            "7": ""
+                        }
+                    ]
+                },
+                {
+                    "type": "hslider",
+                    "label": "bore_tune",
+                    "varname": "fHslider3",
+                    "shortname": "bore_tune",
+                    "address": "/pipe/bore_tune",
+                    "index": 262188,
+                    "meta": [
+                        {
+                            "8": ""
+                        },
+                        {
+                            "unit": "samples"
+                        }
+                    ],
+                    "init": 2,
+                    "min": -8,
+                    "max": 8,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "bore_factor",
+                    "varname": "fHslider1",
+                    "shortname": "bore_factor",
+                    "address": "/pipe/bore_factor",
+                    "index": 262156,
+                    "meta": [
+                        {
+                            "9": ""
+                        }
+                    ],
+                    "init": 1.504,
+                    "min": 0.25,
+                    "max": 2,
+                    "step": 0.001
+                }
+            ]
+        }
+    ]
+}
