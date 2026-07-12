@@ -1,194 +1,142 @@
 # Roadmap
 
 The long-term plan for this site. Each pass is independently shippable and
-ordered by value. Architecture notes are pre-researched (July 2026, versions
-verified) so a future work session can start building instead of investigating.
+ordered by value. Architecture notes are pre-researched so a future work
+session can start building instead of investigating. Refreshed July 2026
+after Passes 1 through 5 shipped.
 
 ## Standing decisions
 
-- **Paths, not subdomains.** Topics live at `/topics/<slug>/`, never
-  `quantum.drishan.com`. One domain compounds SEO authority and identity;
-  subdomains fragment both and multiply deploys. Cross-topic posts (the best
-  ones) can live in several hubs at once. *Escape hatch:* if a topic ever
-  becomes a product with its own app, split that one to a subdomain then and
-  add `_redirects`.
-- **URLs are forever.** Never delete or rename a published path — add a 301 in
-  `public/_redirects`. Slugs stay date-free.
+- **Paths, not subdomains** for topics (`/topics/<slug>/`). One domain
+  compounds SEO authority and identity. The two art galleries are the
+  deliberate exception (audio./photos.drishan.com): personal work, separate
+  rooms, one shared `gallery` repo. *Escape hatch:* if a topic ever becomes
+  a product with its own app, split that one then and add `_redirects`.
+- **URLs are forever.** Never delete or rename a published path; add a 301
+  in `public/_redirects`. Slugs stay date-free.
 - **Zero client-side frameworks, forever.** Interactivity is vanilla JS /
   WebGL / WASM. Heavy computation happens offline on the desktop (RTX 5090,
   96 GB RAM); the site ships the artifacts.
-- **The build is the test suite.** Schema-validate everything; `npm run build`
-  must stay the only gate. Check `/writing/kitchen-sink` (permanent draft)
-  after any rendering-stack change.
-- **Series live inside Writing.** Tutorials are field notes grouped by a
-  `series` collection entry; no separate tutorials section.
-- **Adding a topic** is one line in `TOPICS` (`src/consts.ts`). Hub pages
-  appear only once a topic has published content.
+- **The build is the test suite**, locally and in CI (build workflow runs
+  on every PR). Check `/writing/kitchen-sink` (permanent draft) after any
+  rendering-stack change.
+- **Series live inside Writing.** Adding a topic is one line in `TOPICS`.
+- **Claude scaffolds, Drishan publishes.** Drafts only, private repos until
+  a series ships. Workflows live in `.claude/skills/`; prose rules in
+  CLAUDE.md. Projects live in `code\<domain>-projects\<name>`, one repo
+  each, never in this repo.
 
-## Pass 1 — Platform + tutorial stack (shipped July 2026)
+## Shipped (the first five passes, July 2026)
 
-Centralized draft filtering (`getPublished`), topic taxonomy + hub pages,
-series architecture with series-aware navigation, build-time MathML (Sätteri
-math + Temml plugin), Expressive Code frames, stable note/plate numbering,
-WCAG contrast + UTC date fixes, and the `/writing/kitchen-sink` rendering
-test page. This document's conventions date from that pass.
+1. **Platform + tutorial stack**: draft filtering, topics, series, build-time
+   MathML, Expressive Code, stable numbering, kitchen sink.
+2. **Sound gallery** (audio.drishan.com): grid → dialog slideshow, build-time
+   peaks scrubbers, ridge-line tiles, Opus+AAC pipeline, mobile hardening.
+3. **Photo gallery** (photos.drishan.com): AVIF/WebP/JPEG ladders on R2 at
+   media.drishan.com, EXIF readouts, 3840px download rung.
+4. **Per-post OG cards**: plate-aesthetic PNGs at build time via resvg,
+   one per published note and plate.
+5. **Widget runtime + /lab pattern**: custom elements in Markdown, lazy
+   IntersectionObserver upgrade, first tenant `<psb-workbench>` (the three
+   Faust instruments live inside series part 1).
 
-## Pass 2 — Sound gallery
+Published series: *One GPU, N Qubits* (5 parts, repo public) and *Plucked,
+Struck, Blown* (3 parts, repo public).
 
-Algorithmically designed sounds as a fourth collection. All encoding happens
-offline; the site ships compressed audio + build-time SVG waveforms.
+## Loose ends (do before any new pass)
 
-- **Formats:** dual-encode Opus 128 kbps (`.opus`) + AAC 160–192 kbps
-  (`.m4a`) in `<audio><source>` order (Safari plays Ogg Opus since 18.4, AAC
-  covers older iOS). Optional FLAC master as a download link — masters >25 MiB
-  go to Cloudflare R2, compressed files live in `public/sounds/` (a 2-min
-  Opus is ~2 MB; the Pages 25 MiB/file limit is far away).
-- **Authoring script (one pass per sound):** ffmpeg encode (`-c:a libopus
-  -b:a 128k` / `-c:a aac -b:a 192k`), BBC `audiowaveform` → peaks JSON
-  (`winget install BBC.audiowaveform`), spectrogram thumbnail via librosa or
-  `sox`/ffmpeg with the site palette, emit a frontmatter stub.
-- **Collection schema:** title, date, technique tags, durationSec, sampleRate,
-  seed/params (reproducibility is the differentiator — publish the generating
-  code next to the sound), repo link, audio paths, peaks path, spectrogram
-  image, draft.
-- **Player:** build-time SVG waveform from peaks JSON (an Astro component;
-  zero client JS for the visual) + one shared ~2 KB vanilla module for
-  play/seek/progress with an "only one plays at a time" registry. Native
-  `<audio>` in `<noscript>`. Skip wavesurfer.js.
-- **Later sparkle:** an opt-in "synthesize in your browser" toggle — render
-  the algorithm with a seeded PRNG into `OfflineAudioContext(2, 48000·dur,
-  48000)` (fixed rate = deterministic across devices), created inside the
-  click handler (autoplay policy).
-- **RSS:** `@astrojs/rss` supports `enclosure: {url, length, type}` — point at
-  the M4A, compute `length` with `fs.statSync`.
+- **Audition and hang the seven real gallery pieces** — they are still
+  `draft: true` while the published series points readers at the gallery,
+  which currently shows the three test fixtures. Flip per piece after
+  listening; retire or keep one fixture as a render test.
+- **Publish the Plucked, Struck, Blown work plate** (`draft: true` today, so
+  the flagship series has no plate) and consider adding `project:` links to
+  both series yamls now that plates can exist.
+- Delete the stray `old-cuquantum-wsl2-setup.md` draft (git history keeps it).
+- Review PR #9 (Building a Quantum Compiler series drafts; qcc repo stays
+  private until part 1 publishes).
 
-## Pass 3 — Photo gallery (Leica)
+## Pass 6 — Discovery (the rest of old Pass 4)
 
-Originals never enter git; the repo stays tiny for life.
-
-- **Pipeline:** Lightroom exports sRGB JPEG masters (quality 85–90, profile
-  embedded, long edge ~3600 px) → offline Node script (`sharp` +
-  `exiftool-vendored` — the only EXIF lib that decodes Leica MakerNotes) →
-  AVIF+JPEG ladder at ~640/1080/1600/2560 → `rclone` to a Cloudflare R2
-  bucket behind `photos.drishan.com` (zero egress fees) → script writes a
-  committed `src/data/photos.json` manifest (dimensions, variant URLs, EXIF).
-- **Why offline:** hundreds of images through `astro:assets` at build time
-  risks Cloudflare's 20-minute build timeout, and Cloudflare Image
-  Transformations hard-fail past 5,000 unique transforms/month on the free
-  plan. Pre-generating on the 5090 box keeps builds instant and unmetered.
-- **Color:** sRGB in, sRGB out is shift-free (sharp converts + strips
-  profiles by default). If shipping Display-P3, use `withIccProfile('p3')` —
-  `keepIccProfile()` has a known AVIF gamut bug (sharp #4008).
-- **Collection:** `file('src/data/photos.json')` loader + Zod schema; albums
-  are a field, not folders. EXIF renders in the existing `Readout` component
-  (camera / lens / ISO / aperture — very field-guide).
-- **UI:** CSS `columns` masonry now, `@supports (display: grid-lanes)`
-  enhancement as it stabilizes; native `<dialog>` lightbox (~2 KB vanilla:
-  `showModal()`, arrow keys, manifest dimensions to avoid CLS). PhotoSwipe 5
-  only if pinch/zoom gestures become a requirement.
-
-## Pass 4 — Discovery & sharing
-
-- **Search:** Pagefind (1.5+ has a vanilla web-components UI). Most durable
+- **Search:** Pagefind (vanilla web-components UI). Most durable
   integration: `"build": "astro build && pagefind --site dist"` — it indexes
   built HTML, so it survives any framework change.
-- **Per-post OG images:** template a raw SVG plate (reuse `Glyph.astro`
-  SVGs + Fraunces) → render PNG with `@resvg/resvg-js` in a
-  `src/pages/og/[...slug].png.ts` endpoint at build time. Skips satori's
-  HTML-emulation quirks and matches the plate aesthetic exactly.
-- **RSS upgrades:** full-content feed (feeds outlive sites) and per-topic
-  feeds via `src/pages/topics/[topic]/rss.xml.js`.
+- **Full-content RSS** (feeds outlive sites) and **per-topic feeds** via
+  `src/pages/topics/[topic]/rss.xml.js`.
 - **JSON-LD:** Article + Person structured data in `BaseHead`.
+- **Gallery share polish:** og:image + apple-touch-icon per room (needs a
+  1200×630 asset each; natural once real photos hang).
 
-## Pass 5 — Interactive tutorials & figures
+## Pass 7 — Trust & longevity
 
-When the first tutorial needs a demo (surface-code visualizer, Faust synth,
-ZK verifier):
+- **Licensing footer:** prose CC BY 4.0, code MIT — footer, per-page meta,
+  RSS channel.
+- **Link rot:** `lycheeverse/lychee-action` weekly against built `dist/`;
+  Wayback snapshot cron fed from the sitemap.
+- **Zenodo DOIs** for the public project repos (GitHub integration; plates
+  link `repo` + future `doi`).
+- **Comments:** giscus once tutorials have readers; empty boxes look worse
+  than none. **Analytics:** Cloudflare Web Analytics or nothing.
+- **Hosting:** Pages → Workers static assets migration, calmly, within a
+  year or two; `_redirects` carries over.
 
-- **Widget runtime:** custom elements written directly in Markdown bodies
-  (`<qec-surface-code data-distance="5">` with a static-image fallback
-  child), upgraded by one lazy runtime in the layouts: IntersectionObserver →
-  dynamic `import()` → `customElements.define()`. Each widget is its own
-  hashed chunk. Never `<script>` inside `.md` (passes through unbundled).
-- **WASM:** `?url` import + `instantiateStreaming` with arrayBuffer
-  fallback; intersection-load ≤300 KB, click-to-load with a size label above
-  that. Audio always behind a user gesture.
-- **No site-wide COOP/COEP** (breaks giscus/embeds; Safari lacks
-  `credentialless`). Nothing planned needs SharedArrayBuffer — Faust runs in
-  an AudioWorklet, ZK verification is single-threaded. If ever needed, scope
-  headers to `/lab/*` via `_headers`.
-- **Figures:** generate offline, commit SVGs to `src/assets/figures/<slug>/`,
-  keep the generating script + data in the project repo. Toolchain per class:
-  Qiskit `circuit_drawer(output="mpl")` with a committed style dict; quantikz
-  → `dvisvgm --font-format=woff2 --currentcolor` for showpiece circuits; one
-  committed `fieldguide.mplstyle` (palette hexes, transparent bg,
-  `svg.fonttype: none`) for plots; Stim's built-in SVG diagrams + a color
-  remap for QEC lattices. Inline SVGs into pages so they inherit fonts and
-  `currentColor`.
-- **Benchmark posts:** add an optional `repro` frontmatter block (gpu,
-  driver, cuda, versions, seed, wall-clock, repo/tag) rendered as readout
-  rows; a small `provenance.py` helper in project repos writes it.
+## Pass 8 — The rooms get real
+
+- First real Leica batch through `add-photo` (Lightroom recipe in the
+  gallery README); masonry vs uniform grid decided with real photos on the
+  wall.
+- Field recordings and future project sounds through `add-sound`; the
+  gallery grows a `sounds RSS with audio enclosures` when there are enough
+  pieces to subscribe to.
+- About page gets a photograph of the author. Engineers trust the writing;
+  everyone else looks for a face.
 
 ## Ongoing practice
 
-- **Per-project GitHub repos** (not a monorepo) + `CITATION.cff`; mint a
-  Zenodo DOI per release via the GitHub integration; plates link `repo` (+
-  future `doi`).
-- **Environments:** `uv.lock` per project repo (cuQuantum/Qiskit/Stim are all
-  pip wheels); a short `Dockerfile` on an `nvidia/cuda` base as the
-  decade-scale escape hatch.
-- **Licensing (adopt in a footer pass):** prose CC BY 4.0, code MIT — declare
-  in the footer, per-page meta, and the RSS channel.
-- **Link rot:** `lycheeverse/lychee-action` weekly against built `dist/`;
-  Wayback Machine snapshot cron fed from the sitemap.
-- **Hosting:** Cloudflare Pages is being absorbed into Workers static assets
-  (parity since Mar 2026, no forced deadline) — plan a calm migration within
-  a year or two; `_redirects` carries over. Real insurance: `dist/` is plain
-  HTML, portable anywhere in an afternoon.
-- **Comments/analytics:** giscus (GitHub Discussions) once tutorials have
-  readers — empty comment boxes look worse than none. Cloudflare Web
-  Analytics or nothing; skip self-hosted analytics forever.
-- **Typography (deferred):** if the fraktur itch returns, PragmataPro Fraktur
-  is €49+ display-only (100k pageviews/mo cap + hotlink-protection
-  obligation); test-drive the aesthetic free with UnifrakturMaguntia first,
-  or spend $75 on Berkeley Mono (no caps) to swap the code voice instead.
-  Body/heading trio stays.
+- Per-project repos + `CITATION.cff`; uv.lock committed; provenance JSON
+  stamped into every result; figures via `fieldguide.mplstyle`.
+- Distribution once a series completes: HN submission + one X post + one
+  LinkedIn post, register rules in the `share-note` skill. The blog and RSS
+  are the durable assets; social points at them.
+- Typography itch (PragmataPro Fraktur, Berkeley Mono): unchanged verdict,
+  test free alternatives first, body trio stays.
 
 ## Project idea shelf
 
-Verified against mid-2026 tooling. Each lands a plate + a series (+ a gallery
-artifact where noted). ★ = suggested next.
+★ = suggested next. Each lands a plate + a series (+ gallery artifacts
+where noted).
 
-1. ★ **One GPU, N Qubits** *(quantum × scicomp)* — the drafted flagship.
-   cuQuantum 26.6 added cuPauliProp + cuStabilizer for "beyond 30 qubits"
-   sequels; arc: setup → first sim → the memory wall → cuTensorNet → published
-   scaling data.
-2. ★ **Error correction you can actually run** *(quantum)* — Stim +
-   PyMatching + Google's Tesseract decoder; threshold plots are embarrassingly
-   parallel on 96 GB RAM; capstone: cost-of-a-logical-qubit calculator + a
-   vanilla-JS surface-code widget.
-3. ★ **Faust → WASM sound gallery** *(audio)* — physical-modeling synths
-   compiled to AudioWorklet WASM; ships the Pass-2 gallery with content;
-   autodiff capstone (fit a synth to a recording).
-4. **The sound of decoherence** *(quantum × audio)* — cuDensityMat Lindblad
-   dynamics sonified; Rabi as tremolo, decoherence as decay; feeds the gallery
-   with sounds nobody else has.
-5. **Build a quantum compiler** *(compilers × quantum)* — OpenQASM 3 → MLIR
-   dialect (or xDSL) → passes (fusion, cancellation) → QIR → CUDA-Q; benchmark
-   against Qiskit 2.x transpiler.
-6. **Shor vs. Bitcoin** *(quantum × blockchain)* — Shor on cuQuantum for toy
+**Shipped or in flight:**
+1. ~~One GPU, N Qubits~~ — shipped (5 parts, public repo).
+2. ~~Faust → WASM sound gallery~~ — shipped (3 parts, playable workbench,
+   public repo); the structured-model fit (f0 + stretch law + damping law,
+   3 functions instead of 72 free parameters) is the natural part 4.
+3. **Build a quantum compiler** *(compilers × quantum)* — in flight: qcc
+   repo (QASM3 → xDSL → QIR → CUDA-Q) built, series drafted in PR #9.
+4. **A tiny audio DSL** *(compilers × audio)* — in flight: `wub` (Rust,
+   wobble-bass rate-pattern language, M0 done; staged pad → editor-widget
+   plan). Lands a /lab widget when playable.
+
+**Next up:**
+5. ★ **Error correction you can actually run** *(quantum)* — Stim +
+   PyMatching + Tesseract; threshold plots via sinter across all cores;
+   capstone: cost-of-a-logical-qubit calculator + surface-code widget on
+   the Pass 5 runtime. Kickoff prompt ready:
+   `C:\Users\drishan\code\PROMPT-qec-project.md`.
+6. **The sound of decoherence** *(quantum × audio)* — cuDensityMat Lindblad
+   dynamics sonified; Rabi as tremolo, decoherence as decay; feeds the
+   gallery with sounds nobody else has.
+7. **Concert hall in a GPU** *(audio × scicomp)* — room-acoustics FDTD in
+   CUDA (memory-bandwidth-bound, GDDR7's home turf); auralized impulse
+   responses for the sound gallery.
+8. **Shor vs. Bitcoin** *(quantum × blockchain)* — Shor on cuQuantum for toy
    keys, honest ECDSA resource estimate, ML-DSA signatures in a 200-line
    chain.
-7. **Concert hall in a GPU** *(audio × scicomp)* — room-acoustics FDTD in
-   CUDA (memory-bandwidth-bound — GDDR7's home turf); auralized impulse
-   responses for the sound gallery, wave renders for the photo gallery.
-8. **A tiny audio DSL** *(compilers × audio)* — ~2k-line compiler, native +
-   WASM backends, playable on the site.
-9. **GPU ZK prover, browser verifier** *(blockchain × optimization)* — ICICLE
-   MSM/NTT on the 5090 (public benchmarks mostly stop at 4090), whimsical
-   proof, in-browser WASM verification widget.
+9. **GPU ZK prover, browser verifier** *(blockchain × optimization)* —
+   ICICLE MSM/NTT on the 5090, whimsical proof, in-browser WASM verifier
+   widget.
 10. **A RAW developer for the Leica gallery** *(graphics × photography)* —
-    CUDA demosaic + tone map + physically-based grain; develops the Pass-3
-    gallery and rhymes with the site's grain shader.
-11. **Noisy circuits with PTSBE** *(quantum)* — CUDA-Q 0.14's new
-    pre-trajectory sampling; near-zero competing content; short 3-part series.
+    CUDA demosaic + tone map + physically-based grain; develops Pass 8 and
+    rhymes with the site's grain shader.
+11. **Noisy circuits with PTSBE** *(quantum)* — CUDA-Q pre-trajectory
+    sampling; near-zero competing content; short 3-part series.
