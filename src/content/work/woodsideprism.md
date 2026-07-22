@@ -8,7 +8,7 @@ length: 'Ongoing'
 order: 3
 glyph: spectrum
 topics: ['ai']
-draft: false
+draft: true
 ---
 
 As one of the first engineers at the company, I built the retrieval-augmented
