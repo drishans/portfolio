@@ -69,7 +69,7 @@ The delay line then makes up whatever the filters didn't use, so the loop
 still totals one period. Measured against intent: a 220 Hz pluck comes out at
 219.93 Hz, **0.6 cents flat**. I'll take it.
 
-![Nine plucks of the wire: harmonic combs with pick-position notches, decaying exponentially](../../assets/figures/plucked-struck-blown/wire-study.png)
+![Nine plucks of the wire: harmonic combs with pick-position notches, decaying exponentially](../../../assets/figures/plucked-struck-blown/wire-study.png)
 
 ## The bar: nine modes and a contact time
 
@@ -112,7 +112,7 @@ Mode frequencies land within a quarter cent. This exactness is the setup for
 part 3: if the synth *is* a sum of decaying sines with known parameters, a
 fit that claims to recover them can be graded against an answer key.
 
-![Bell plate: three strikes of the same bar, inharmonic mode lines ringing at different mixes](../../assets/figures/plucked-struck-blown/bell-plate.png)
+![Bell plate: three strikes of the same bar, inharmonic mode lines ringing at different mixes](../../../assets/figures/plucked-struck-blown/bell-plate.png)
 
 ## The pipe: the loop picks its own note
 
@@ -159,7 +159,7 @@ where the physics does). Vibrato is applied to *breath*, not frequency,
 because that's where flutists put it. Articulation in the gallery piece
 *Air phrase* is nothing but a 60 ms dip below speaking pressure.
 
-![Breath tone: broadband air for 1.5 seconds, then the jet finds the pipe and harmonic lines snap in](../../assets/figures/plucked-struck-blown/breath-tone.png)
+![Breath tone: broadband air for 1.5 seconds, then the jet finds the pipe and harmonic lines snap in](../../../assets/figures/plucked-struck-blown/breath-tone.png)
 
 ## One lesson the hard way
 

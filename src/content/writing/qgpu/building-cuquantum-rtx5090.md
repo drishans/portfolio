@@ -58,7 +58,7 @@ qubit to the right.
 No amount of GPU compute changes the size of the vector you have to
 store. Compute is what you optimize *after* the state fits.
 
-![State size vs qubit count against the 31.8 GiB VRAM line. Rings mark sizes that silently spilled to system RAM, × marks failed allocations](../../assets/figures/one-gpu-n-qubits/memory-wall.svg)
+![State size vs qubit count against the 31.8 GiB VRAM line. Rings mark sizes that silently spilled to system RAM, × marks failed allocations](../../../assets/figures/one-gpu-n-qubits/memory-wall.svg)
 
 ## Why a gate is a memory operation
 

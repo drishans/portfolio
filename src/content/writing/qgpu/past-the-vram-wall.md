@@ -41,7 +41,7 @@ In VRAM, times double per qubit like clockwork. Then the state outgrows the
 card, and adding a qubit stops costing 2×: the first spilled gate costs
 **7× the last in-VRAM gate**, the next one **72×**. That's the cliff.
 
-![Single-gate time vs qubits, log scale: clean doubling in VRAM, then the spill cliff](../../assets/figures/one-gpu-n-qubits/wall-cliff.svg)
+![Single-gate time vs qubits, log scale: clean doubling in VRAM, then the spill cliff](../../../assets/figures/one-gpu-n-qubits/wall-cliff.svg)
 
 The shape of the slowdown is exactly what a paging story predicts. At
 32 GiB, roughly half the state still sits in VRAM, so the speeds blend. At
@@ -72,7 +72,7 @@ runtime page on demand. Same H-gate probe, state on managed memory
 | 32 GiB (over) | 190 ms · 337 GiB/s | 1,793 ms · **36 GiB/s** |
 | 64 GiB (over) | 1,873 ms · 68 GiB/s | *allocation fails* |
 
-![Per-gate cost by memory type and size: managed memory flat at PCIe speed regardless of fit](../../assets/figures/one-gpu-n-qubits/offload.svg)
+![Per-gate cost by memory type and size: managed memory flat at PCIe speed regardless of fit](../../../assets/figures/one-gpu-n-qubits/offload.svg)
 
 Read that table twice, because it's rude. On WSL2, managed memory runs at a
 flat ~34 GiB/s, **even when the state would comfortably fit in VRAM**. The
