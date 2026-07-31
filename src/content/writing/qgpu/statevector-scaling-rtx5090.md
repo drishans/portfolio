@@ -1,7 +1,7 @@
 ---
 title: "What a gate costs: statevector scaling on the 5090"
 description: Real circuits from 24 to 30 qubits, timed properly. The exponential shows up on schedule, the GPU runs at memory speed, and the QFT refuses to be slow.
-pubDate: 2026-07-07
+pubDate: 2026-07-06
 tags: ['quantum', 'gpu', 'cuquantum', 'benchmarks']
 topics: ['quantum', 'scicomp']
 series:

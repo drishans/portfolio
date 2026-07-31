@@ -1,7 +1,7 @@
 ---
 title: "The soft wall: what happens past 32 GiB"
 description: The driver doesn't say no anymore; it quietly pages your statevector over PCIe. Measuring the cliff, and why the official offload tool loses to the automatic one.
-pubDate: 2026-07-08
+pubDate: 2026-07-07
 tags: ['quantum', 'gpu', 'cuda', 'memory']
 topics: ['quantum', 'scicomp']
 series:

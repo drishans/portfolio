@@ -1,7 +1,7 @@
 ---
 title: "A hundred qubits in four milliseconds (terms and conditions apply)"
 description: cuTensorNet stops storing the state and the qubit ceiling evaporates; the wall comes back wearing a different coat. Measured to the knee, plus what the whole series adds up to.
-pubDate: 2026-07-02
+pubDate: 2026-07-08
 tags: ['quantum', 'gpu', 'cuquantum', 'tensor-networks']
 topics: ['quantum', 'scicomp']
 series:
