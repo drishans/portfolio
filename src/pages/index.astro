@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import GrainField from '../components/GrainField.astro';
 import PlateCard from '../components/PlateCard.astro';
 import NoteRow from '../components/NoteRow.astro';
-import { getPublished, byOrder, byDate, readingMinutes, pad, noteNumbers } from '../utils';
+import { getPublished, byOrder, byDate, readingMinutes, pad, noteNumbers, slugOf } from '../utils';
 import { SITE } from '../consts';
 
 const work = (await getPublished('work')).sort(byOrder).slice(0, 4);
@@ -49,7 +49,7 @@ const writing = allWriting.slice(0, 4);
             year={p.data.year}
             stack={p.data.stack}
             glyph={p.data.glyph}
-            href={`/work/${p.id}/`}
+            href={`/work/${slugOf(p.id)}/`}
           />
         ))}
       </div>
@@ -70,7 +70,7 @@ const writing = allWriting.slice(0, 4);
           <NoteRow
             no={numbers.get(post.id)!}
             title={post.data.title}
-            href={`/writing/${post.id}/`}
+            href={`/writing/${slugOf(post.id)}/`}
             date={post.data.pubDate}
             minutes={readingMinutes(post.body)}
             tags={post.data.tags}

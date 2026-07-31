@@ -5,7 +5,7 @@
  */
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { TOPICS, type TopicSlug } from '../../consts';
-import { byDate, byOrder, formatDate, getPublished, noteNumbers, plateNumbers } from '../../utils';
+import { byDate, byOrder, formatDate, getPublished, noteNumbers, plateNumbers, slugOf } from '../../utils';
 import { renderOgPng, type OgCard } from '../../lib/og-card';
 
 // The same instrument-diagram language as the site: each topic keeps a glyph.
@@ -30,7 +30,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return [
     ...posts.map((p) => ({
-      params: { slug: `writing/${p.id}` },
+      params: { slug: `writing/${slugOf(p.id)}` },
       props: {
         eyebrow: `Field note №${nums.get(p.id)} · ${TOPICS[p.data.topics[0] as TopicSlug]}`,
         title: p.data.title,
@@ -39,7 +39,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
       } satisfies OgCard,
     })),
     ...work.map((w) => ({
-      params: { slug: `work/${w.id}` },
+      params: { slug: `work/${slugOf(w.id)}` },
       props: {
         eyebrow: `Plate ${plates.get(w.id)} · ${w.data.year}`,
         title: w.data.title,

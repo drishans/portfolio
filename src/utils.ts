@@ -33,6 +33,21 @@ export function byDate(a: Dated, b: Dated) {
 export const pad = (n: number) => String(n).padStart(2, '0');
 
 /**
+ * Public slug for an entry, with any source-folder prefix stripped:
+ * `writing/qgpu/past-the-vram-wall` → `past-the-vram-wall`.
+ *
+ * Content files can be foldered for authoring convenience without that
+ * structure leaking into URLs — published permalinks are permanent, so the
+ * on-disk layout must stay free to change. Every writing/work URL is built
+ * through this, never from `entry.id` directly.
+ *
+ * Consequence: leaf filenames are the real namespace and must stay unique
+ * across folders within a collection. Two files with the same name generate
+ * the same path and the build fails on the duplicate.
+ */
+export const slugOf = (id: string) => id.split('/').pop()!;
+
+/**
  * Stable field-note numbers: №01 is the oldest post, so numbers never change
  * when a new note is published (position-derived numbering would renumber
  * everything on each publish). Precondition: publish in date order — when

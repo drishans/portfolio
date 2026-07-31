@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import NoteRow from '../../components/NoteRow.astro';
-import { getPublished, byDate, readingMinutes, noteNumbers } from '../../utils';
+import { getPublished, byDate, readingMinutes, noteNumbers, slugOf } from '../../utils';
 import { SITE, TOPICS, type TopicSlug } from '../../consts';
 
 const posts = (await getPublished('writing')).sort(byDate);
@@ -50,7 +50,7 @@ const years = [...groups.keys()].sort((a, b) => b - a);
               <NoteRow
                 no={numbers.get(post.id)!}
                 title={post.data.title}
-                href={`/writing/${post.id}/`}
+                href={`/writing/${slugOf(post.id)}/`}
                 date={post.data.pubDate}
                 minutes={readingMinutes(post.body)}
                 tags={post.data.tags}
