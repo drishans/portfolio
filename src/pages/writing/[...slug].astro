@@ -1,7 +1,7 @@
 ---
 import Post from '../../layouts/Post.astro';
 import { getEntry, render } from 'astro:content';
-import { getPublished, byDate, readingMinutes } from '../../utils';
+import { getPublished, byDate, readingMinutes, slugOf } from '../../utils';
 
 export async function getStaticPaths() {
   const posts = (await getPublished('writing')).sort(byDate);
@@ -10,12 +10,12 @@ export async function getStaticPaths() {
     const olderEntry = posts[i + 1];
     const newerEntry = posts[i - 1];
     return {
-      params: { slug: entry.id },
+      params: { slug: slugOf(entry.id) },
       props: {
         entry,
         minutes: readingMinutes(entry.body),
-        chronoPrev: olderEntry ? { title: olderEntry.data.title, href: `/writing/${olderEntry.id}/` } : null,
-        chronoNext: newerEntry ? { title: newerEntry.data.title, href: `/writing/${newerEntry.id}/` } : null,
+        chronoPrev: olderEntry ? { title: olderEntry.data.title, href: `/writing/${slugOf(olderEntry.id)}/` } : null,
+        chronoNext: newerEntry ? { title: newerEntry.data.title, href: `/writing/${slugOf(newerEntry.id)}/` } : null,
       },
     };
   });
@@ -50,10 +50,10 @@ if (entry.data.series) {
     // At the ends of a series, fall back to the chronological neighbor so the
     // reader never hits a dead end.
     prev = prevPart
-      ? { title: prevPart.data.title, href: `/writing/${prevPart.id}/`, label: `← Part ${prevPart.data.series!.part}` }
+      ? { title: prevPart.data.title, href: `/writing/${slugOf(prevPart.id)}/`, label: `← Part ${prevPart.data.series!.part}` }
       : chronoPrev;
     next = nextPart
-      ? { title: nextPart.data.title, href: `/writing/${nextPart.id}/`, label: `Part ${nextPart.data.series!.part} →` }
+      ? { title: nextPart.data.title, href: `/writing/${slugOf(nextPart.id)}/`, label: `Part ${nextPart.data.series!.part} →` }
       : chronoNext;
   }
 }

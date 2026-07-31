@@ -2,7 +2,7 @@
 import Base from './Base.astro';
 import Readout from '../components/Readout.astro';
 import type { CollectionEntry } from 'astro:content';
-import { getPublished } from '../utils';
+import { getPublished, slugOf } from '../utils';
 import { TOPICS } from '../consts';
 
 interface Props {
@@ -31,7 +31,7 @@ const relatedSeries = (await getPublished('series')).filter(
 );
 ---
 
-<Base title={`${d.title} — Work`} description={d.summary} type="article" image={`/og/work/${entry.id}.png`} imageAlt={`Work plate: ${d.title}`}>
+<Base title={`${d.title} — Work`} description={d.summary} type="article" image={`/og/work/${slugOf(entry.id)}.png`} imageAlt={`Work plate: ${d.title}`}>
   <article class="section">
     <div class="wrap">
       <a href="/work/" class="back mono">← All plates</a>

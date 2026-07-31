@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PlateCard from '../../components/PlateCard.astro';
 import NoteRow from '../../components/NoteRow.astro';
-import { getPublished, byOrder, byDate, readingMinutes, noteNumbers, plateNumbers } from '../../utils';
+import { getPublished, byOrder, byDate, readingMinutes, noteNumbers, plateNumbers, slugOf } from '../../utils';
 import { SITE, TOPICS, type TopicSlug } from '../../consts';
 
 export async function getStaticPaths() {
@@ -72,7 +72,7 @@ const series = (await getPublished('series')).filter(
                 year={p.data.year}
                 stack={p.data.stack}
                 glyph={p.data.glyph}
-                href={`/work/${p.id}/`}
+                href={`/work/${slugOf(p.id)}/`}
                 headingLevel="h3"
               />
             ))}
@@ -88,7 +88,7 @@ const series = (await getPublished('series')).filter(
               <NoteRow
                 no={numbers.get(post.id)!}
                 title={post.data.title}
-                href={`/writing/${post.id}/`}
+                href={`/writing/${slugOf(post.id)}/`}
                 date={post.data.pubDate}
                 minutes={readingMinutes(post.body)}
                 tags={post.data.tags}

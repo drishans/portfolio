@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PlateCard from '../../components/PlateCard.astro';
-import { getPublished, byOrder, pad } from '../../utils';
+import { getPublished, byOrder, pad, slugOf } from '../../utils';
 import { SITE } from '../../consts';
 
 const work = (await getPublished('work')).sort(byOrder);
@@ -29,7 +29,7 @@ const work = (await getPublished('work')).sort(byOrder);
             year={p.data.year}
             stack={p.data.stack}
             glyph={p.data.glyph}
-            href={`/work/${p.id}/`}
+            href={`/work/${slugOf(p.id)}/`}
             headingLevel="h2"
           />
         ))}

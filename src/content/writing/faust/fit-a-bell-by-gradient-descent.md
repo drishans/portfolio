@@ -88,9 +88,9 @@ thousand is a census. (My FFT peak-picking "smart" candidate, which aced
 the earlier magnitude-only loss, didn't even make the top 64 under the
 envelope-aware one. Priors are humbling.)
 
-![All 4096 stage-A candidates sorted by final loss, survivors marked](../../assets/figures/plucked-struck-blown/bar-recovery-restarts.svg)
+![All 4096 stage-A candidates sorted by final loss, survivors marked](../../../assets/figures/plucked-struck-blown/bar-recovery-restarts.svg)
 
-![Designed vs recovered modes on a frequency-decay plane, cents error annotated, three faint modes marked missed](../../assets/figures/plucked-struck-blown/bar-recovery-modes.svg)
+![Designed vs recovered modes on a frequency-decay plane, cents error annotated, three faint modes marked missed](../../../assets/figures/plucked-struck-blown/bar-recovery-modes.svg)
 
 Recovered against the answer key, six of nine modes, four essentially exact:
 
@@ -121,7 +121,7 @@ under a second). Sixty-four survivor slots went to candidates that spent
 their modes where the loss lived instead. Brute force finds what's loud;
 what's faint still takes luck we didn't buy tonight.
 
-![Target, forgery, and residual spectrograms on a shared dB scale; the residual keeps only the attack](../../assets/figures/plucked-struck-blown/bar-recovery-triptych.png)
+![Target, forgery, and residual spectrograms on a shared dB scale; the residual keeps only the attack](../../../assets/figures/plucked-struck-blown/bar-recovery-triptych.png)
 
 ## The string, forged by a bell
 
@@ -157,7 +157,7 @@ this pluck was the crowded top of the comb. The exam grades itself: a bank
 of *free* modes is the right tool for a bell and a spendthrift way to
 describe a string.
 
-![String target, forgery, and residual: the forgery is a 24-mode subset of a 40-partial comb; the residual keeps the rest](../../assets/figures/plucked-struck-blown/string-forgery-triptych.png)
+![String target, forgery, and residual: the forgery is a 24-mode subset of a 40-partial comb; the residual keeps the rest](../../../assets/figures/plucked-struck-blown/string-forgery-triptych.png)
 
 Which points at the real sequel. Part 1 *knows* this instrument: its
 partials are one fundamental, a stretch law, and a damping law. Three

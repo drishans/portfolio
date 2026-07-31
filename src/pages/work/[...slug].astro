@@ -1,7 +1,7 @@
 ---
 import Project from '../../layouts/Project.astro';
 import { render } from 'astro:content';
-import { getPublished, byOrder } from '../../utils';
+import { getPublished, byOrder, slugOf } from '../../utils';
 
 export async function getStaticPaths() {
   const items = (await getPublished('work')).sort(byOrder);
@@ -9,11 +9,11 @@ export async function getStaticPaths() {
     const prevEntry = items[i - 1];
     const nextEntry = items[i + 1];
     return {
-      params: { slug: entry.id },
+      params: { slug: slugOf(entry.id) },
       props: {
         entry,
-        prev: prevEntry ? { title: prevEntry.data.title, href: `/work/${prevEntry.id}/` } : null,
-        next: nextEntry ? { title: nextEntry.data.title, href: `/work/${nextEntry.id}/` } : null,
+        prev: prevEntry ? { title: prevEntry.data.title, href: `/work/${slugOf(prevEntry.id)}/` } : null,
+        next: nextEntry ? { title: nextEntry.data.title, href: `/work/${slugOf(nextEntry.id)}/` } : null,
       },
     };
   });

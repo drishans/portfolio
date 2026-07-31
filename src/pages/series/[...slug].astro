@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import NoteRow from '../../components/NoteRow.astro';
 import Readout from '../../components/Readout.astro';
 import { getEntry } from 'astro:content';
-import { getPublished, readingMinutes, pad } from '../../utils';
+import { getPublished, readingMinutes, pad, slugOf } from '../../utils';
 import { TOPICS } from '../../consts';
 
 const LEVELS = {
@@ -58,7 +58,7 @@ const rows = [
           )}
           {projectLive && (
             <div class="links">
-              <a class="link mono" href={`/work/${projectLive.id}/`}>Project plate →</a>
+              <a class="link mono" href={`/work/${slugOf(projectLive.id)}/`}>Project plate →</a>
             </div>
           )}
         </aside>
@@ -70,7 +70,7 @@ const rows = [
               <NoteRow
                 no={pad(post.data.series!.part)}
                 title={post.data.title}
-                href={`/writing/${post.id}/`}
+                href={`/writing/${slugOf(post.id)}/`}
                 date={post.data.pubDate}
                 minutes={readingMinutes(post.body)}
                 tags={post.data.tags}

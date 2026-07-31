@@ -61,7 +61,7 @@ clean you could set a metronome by it. At 30 qubits, one layer of one gate
 per qubit takes two seconds. A thousand-layer circuit is a lunch break. The
 exponential doesn't negotiate; it just hasn't gotten *steep* yet.
 
-![Layer time vs qubit count, both circuit families and precisions: parallel straight lines on a log scale](../../assets/figures/one-gpu-n-qubits/gate-scaling.svg)
+![Layer time vs qubit count, both circuit families and precisions: parallel straight lines on a log scale](../../../assets/figures/one-gpu-n-qubits/gate-scaling.svg)
 
 ## The gate is a memcpy
 
@@ -79,7 +79,7 @@ six state-size doublings, in both precisions. The compute units are idling;
 the memory controller is flat out. "Statevector simulation is
 memory-bandwidth-bound" isn't a slogan, it's a horizontal line.
 
-![Effective bandwidth per gate vs qubits: random-local flat at ~1450 GiB/s, QFT apparently above spec](../../assets/figures/one-gpu-n-qubits/bandwidth.svg)
+![Effective bandwidth per gate vs qubits: random-local flat at ~1450 GiB/s, QFT apparently above spec](../../../assets/figures/one-gpu-n-qubits/bandwidth.svg)
 
 Corollary: **fp32 is half the cost of fp64, almost to the digit**. The
 ratio sits at 1.98–1.99 everywhere except the smallest size, where

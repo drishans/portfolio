@@ -76,7 +76,7 @@ no exploitable structure." Width fixed at 32 qubits, depth cranked:
 |    32 |    2.7×10¹³ | 8 GiB | *over budget* |
 |    40 |    5.4×10¹³ | 8 GiB | *over budget* |
 
-![Left: GHZ contraction time flat out to 100 qubits. Right: brickwork cost estimates climbing exponentially with depth, crossing the FLOP budget line](../../assets/figures/one-gpu-n-qubits/tensornet.svg)
+![Left: GHZ contraction time flat out to 100 qubits. Right: brickwork cost estimates climbing exponentially with depth, crossing the FLOP budget line](../../../assets/figures/one-gpu-n-qubits/tensornet.svg)
 
 The estimated cost climbs **nine orders of magnitude while the qubit count
 never moves.** Around depth 24 the intermediates hit gigabytes and a single

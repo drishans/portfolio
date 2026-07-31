@@ -2,7 +2,7 @@
 import Base from './Base.astro';
 import type { CollectionEntry } from 'astro:content';
 import type { MarkdownHeading } from 'astro';
-import { formatDate } from '../utils';
+import { formatDate, slugOf } from '../utils';
 import { TOPICS } from '../consts';
 
 interface Props {
@@ -30,7 +30,7 @@ const showToc = toc.length >= 4;
   title={`${d.title} — Writing`}
   description={d.description}
   type="article"
-  image={`/og/writing/${entry.id}.png`}
+  image={`/og/writing/${slugOf(entry.id)}.png`}
   imageAlt={`Field-note plate: ${d.title}`}
   publishedTime={d.pubDate}
   modifiedTime={d.updatedDate}
