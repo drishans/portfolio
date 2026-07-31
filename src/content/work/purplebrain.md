@@ -8,7 +8,7 @@ length: '~4 months'
 order: 2
 glyph: waveform
 topics: ['audio']
-draft: false
+draft: true
 ---
 
 PurpleBrain takes a stream of EEG data and turns it into sound in real time —

@@ -9,7 +9,7 @@ order: 4
 glyph: phases
 live: https://spinwin.fly.dev
 repo: https://github.com/drishans/spinwin
-draft: false
+draft: true
 ---
 
 I built this for WomenNowTV's live event at a venue with about 600–700 attendees. The idea was straightforward: people spin a wheel on their phone, win a prize, and walk away with a cryptographically signed QR code they can show at a prize desk. Staff verify the ticket by scanning it—no internet needed, right there in the scanner's browser.

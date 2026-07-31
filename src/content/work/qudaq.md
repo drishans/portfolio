@@ -8,7 +8,7 @@ length: '~10 months'
 order: 1
 glyph: polar
 topics: ['quantum']
-draft: false
+draft: true
 ---
 
 QuDaQ was the data-acquisition and instrument control layer behind a quantum
