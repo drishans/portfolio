@@ -9,7 +9,7 @@ order: 5
 glyph: contour
 topics: ['audio', 'scicomp']
 repo: https://github.com/drishans/plucked-struck-blown
-draft: true
+draft: false
 ---
 
 One instrument per way of making an object vibrate: a plucked wire (extended
@@ -44,7 +44,4 @@ recovers mode frequencies to within a few cents; pointed at the *string*, a
 model it can't exactly represent, the recovered partials trace the
 dispersion stretch the allpasses were designed to cause.
 
-The series walks through all of it:
-[the instruments](/writing/three-instruments-in-faust),
-[the toolchain](/writing/faust-to-wasm-audioworklet),
-[the fit](/writing/fit-a-bell-by-gradient-descent).
+[The series walks through all of it](/series/plucked-struck-blown).
