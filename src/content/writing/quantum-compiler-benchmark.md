@@ -1,8 +1,8 @@
 ---
-title: "The scoreboard: qcc against Qiskit and pytket"
-description: Emitting QIR, running it on CUDA-Q, and the honest benchmark. Four local passes match or beat the Qiskit transpiler's O2/O3 on eight of ten suites at a fraction of pytket's compile time, and lose exactly where they should.
+title: "The scoreboard: qcc against Qiskit, pytket, and Q#"
+description: Emitting QIR, running it on CUDA-Q, and the honest benchmark. Four local passes match or beat the Qiskit transpiler's O2/O3 on eight of ten suites at a fraction of pytket's compile time, lose exactly where they should, and reveal what Microsoft's QDK is actually for.
 pubDate: 2026-07-08
-tags: ['compilers', 'quantum', 'qir', 'cuda-q', 'benchmarks']
+tags: ['compilers', 'quantum', 'qir', 'cuda-q', 'qsharp', 'benchmarks']
 topics: ['compilers', 'quantum']
 series:
   id: building-a-quantum-compiler
@@ -132,6 +132,50 @@ resynthesis is the thing it's spending that time on.
 
 ![Optimization wall time per suite on a log scale, median marked; pytket two orders of magnitude slower](../../assets/figures/building-a-quantum-compiler/compile-times.svg)
 
+## The Q# stack plays a different game
+
+Microsoft's QDK belongs in this story, but not in the table above, because
+its compiler is not an optimizing transpiler and pretending it is one would
+be a category error. The QDK is a language frontend: it lowers Q# and, since
+its OpenQASM support landed, OpenQASM 3 to QIR, and by design leaves
+gate-level optimization to whatever consumes the QIR downstream. That
+architectural bet is measurable, so I measured it
+([`results/qdk_qir_compare.json`](https://github.com/drishans/qcc/blob/main/results/qdk_qir_compare.json)).
+
+The comparison that is fair to both: feed the QDK and qcc the identical
+OpenQASM 3, and count the *QIR instructions* each emits with one shared
+parser, so each side pays for its own lowering choices. On eight of ten
+suites the QDK's base-profile QIR is instruction-for-instruction the size of
+unoptimized qcc at `-O0`. The two QFT rows differ for a lowering reason, not
+an optimization one: the QDK keeps a native `swap` intrinsic, while qcc's
+emission expands swap into three `cx`. Confirmed, then: the QDK does what it
+says on the tin, and an optimizer in front of it has real work to do.
+
+| suite | QDK (base) | qcc -O0 | qcc -O1 |
+| --- | ---: | ---: | ---: |
+| qft n10 | 240 | 250 | **214** |
+| clifford+T n8 (a) | 320 | 320 | **226** |
+| vqe su2 n10 r3 | 267 | 267 | **130** |
+| adder b4 | 113 | 113 | **109** |
+| qaoa n12 p2 (a) | 144 | 144 | 153 |
+
+The QAOA row is a metric lesson I nearly optimized away for the wrong
+reason. Fusion coarsens pairs of cheap gates into `u3`, and base-profile QIR
+has no generic one-qubit intrinsic, so a three-angle `u3` re-expands into
+three rotations: the optimizer improved the IR gate count and pessimized the
+QIR instruction count. Every optimizing compiler makes this exact trade
+(Qiskit's `u`, tket's TK1), the two-qubit count that dominates hardware cost
+is untouched, and the free half of the fix was real: eliding near-zero ZYZ
+angles at emission, so a `u3` that is really one rotation costs one
+instruction. That change alone erased the adder regression and cut the
+Clifford+T and ansatz QIR sizes.
+
+Two more numbers for the road. Median source-to-QIR compile: QDK 84 ms, qcc
+33 ms. And the cross-stack check that matters most: the QDK's own simulator
+executes qcc's *optimized* output for GHZ-12 and reproduces exactly the
+two-bitstring support. Two independently built stacks agreeing across a
+shared IR boundary is what QIR is for.
+
 ## What this proves, and what it doesn't
 
 Four local def-use rewrites, none longer than a screen, get you to parity with a
@@ -146,5 +190,6 @@ them from their unitary, the KAK decomposition, which is the natural next thing
 to build and a good subject for wherever this series goes next.
 
 Every figure and number here regenerates from the repo with `uv run python
-bench/run_bench.py`, on an RTX 5090 with Qiskit 2.5, pytket 2.18, CUDA-Q 0.15,
-and xDSL 0.68, all recorded in the results JSON's provenance block.
+bench/run_bench.py` and `uv run python bench/qdk_compare.py`, on an RTX 5090
+with Qiskit 2.5, pytket 2.18, CUDA-Q 0.15, QDK 1.31, and xDSL 0.68, all
+recorded in the results JSONs' provenance blocks.
