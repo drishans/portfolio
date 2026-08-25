@@ -1,13 +1,13 @@
 ---
 title: "How to trust a compiler you just wrote"
 description: A frontend is easy to write and easy to get subtly wrong. Before optimizing anything, build an independent oracle and let random circuits attack it. The differential harness that caught every real bug in qcc.
-pubDate: 2026-07-08
+pubDate: 2026-08-19
 tags: ['compilers', 'quantum', 'testing', 'openqasm', 'simulation']
 topics: ['compilers', 'quantum']
 series:
   id: building-a-quantum-compiler
   part: 2
-draft: true
+draft: false
 ---
 
 Part 1 built an IR where qubits are SSA values and optimizations

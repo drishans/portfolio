@@ -1,20 +1,20 @@
 ---
 title: "The scoreboard: qcc against Qiskit, pytket, and Q#"
 description: Emitting QIR, running it on CUDA-Q, and the honest benchmark. Four local passes match or beat the Qiskit transpiler's O2/O3 on eight of ten suites at a fraction of pytket's compile time, lose exactly where they should, and reveal what Microsoft's QDK is actually for.
-pubDate: 2026-07-08
+pubDate: 2026-08-21
 tags: ['compilers', 'quantum', 'qir', 'cuda-q', 'qsharp', 'benchmarks']
 topics: ['compilers', 'quantum']
 series:
   id: building-a-quantum-compiler
   part: 4
-draft: true
+draft: false
 ---
 
 The first three parts built an IR (part 1), an oracle (part 2), and four
 optimization passes (part 3). This part
 takes the optimized circuit out of the compiler and into the world: it emits
-QIR, runs on CUDA-Q, and then measures qcc against the two transpilers people
-actually use. Every number here comes from
+QIR, runs on CUDA-Q, and then measures qcc against modern transpilers. 
+Every number here comes from
 [`results/compile_bench.json`](https://github.com/drishans/qcc/blob/main/results/compile_bench.json),
 stamped with the machine it ran on.
 
@@ -41,7 +41,7 @@ entry:
 ## CUDA-Q: driving the GPU
 
 For execution I target CUDA-Q. One finding worth recording, current as of CUDA-Q
-0.15 (July 2026): there is no public API to ingest external QIR back into a
+0.15 (August 2026): there is no public API to ingest external QIR back into a
 kernel. QIR is an output, not an input. So the execution backend builds a CUDA-Q
 kernel from the same optimized IR through the kernel-builder API, and QIR stays
 the portable artifact. If a later release adds QIR ingestion, that becomes a

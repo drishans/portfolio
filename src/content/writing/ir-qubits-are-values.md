@@ -1,25 +1,22 @@
 ---
 title: "Qubits are values, not registers"
 description: The one data-structure choice that makes a quantum optimizer almost write itself. Qubits as SSA values, gates as pure functions, and the no-cloning theorem enforced by a linear-type verifier.
-pubDate: 2026-07-08
+pubDate: 2026-08-18
 tags: ['compilers', 'quantum', 'mlir', 'ssa', 'xdsl']
 topics: ['compilers', 'quantum']
 series:
   id: building-a-quantum-compiler
   part: 1
-draft: true
+draft: false
 ---
 
-I wanted to build a real optimizing compiler for quantum circuits: OpenQASM 3
-in, optimized code out, benchmarked honestly against the tools people actually
-use. The whole thing lives in one small repo,
+I wanted to build and optimize a compiler for quantum circuits, and benchmark
+against some popular tools. The whole thing lives in one small repo,
 [qcc](https://github.com/drishans/qcc), and this series walks it end to end.
 
 The surprise, which is the subject of this first part, is that almost none of
 the difficulty is in the optimizations. It's in the data structure you optimize
-*over*. Pick the right intermediate representation and the passes turn into a
-few lines each. Pick the obvious one and you spend all your time on bookkeeping
-that has nothing to do with quantum computing.
+*over*. The right intermediate representation matters.
 
 ## The obvious IR, and why it fights you
 

@@ -1,13 +1,13 @@
 ---
-title: "Four rewrites and one hard lesson about ordering"
+title: "Four rewrites and a lesson about ordering"
 description: The qcc optimizer is four local def-use rewrites that cancel inverses, merge rotations, fuse single-qubit runs by ZYZ, and push gates through what they commute with. The commutation pass is where I learned a locally good rewrite can be globally bad.
-pubDate: 2026-07-08
+pubDate: 2026-08-20
 tags: ['compilers', 'quantum', 'optimization', 'rewriting']
 topics: ['compilers', 'quantum']
 series:
   id: building-a-quantum-compiler
   part: 3
-draft: true
+draft: false
 ---
 
 With an IR that makes "next gate on this wire" a pointer hop (part 1) and an
