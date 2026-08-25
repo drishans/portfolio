@@ -48,17 +48,13 @@ spend it on the strongest card (the playable Faust series), then qcc.
 
 ## Debts (pay before pulling new work)
 
-- **qcc repo is private behind a published series.** Every repo link in
-  four live posts 404s for readers. Flip it public (and publish the qcc
-  plate after the voice pass).
-- **The gallery still hangs the three test fixtures.** Seven finished
-  pieces, The forgery included, have sat `draft: true` since July while
-  the Faust series points readers at the wall. Audition, flip, retire the
-  fixtures (keep one as a permanent draft render test).
-- **/work/qudaq/ and /work/woodsideprism/ now 404** after the plate cull;
-  add 301s to `/work/` (two lines in `_redirects`).
 - Delete the stray `old-cuquantum-wsl2-setup.md` draft.
 - Land the open KAK resynthesis part (PR #13) into the qcc series.
+
+Paid in August: qcc repo public and its series links whole again; the
+seven real pieces hung in the sound gallery (fixtures retired to
+permanent draft render tests); 301s added for the retired qudaq and
+woodsideprism plate URLs.
 
 ## Track: Reach
 
@@ -77,8 +73,9 @@ none started, all small.
 
 ## Track: Rooms
 
-- Audition backlog (see Debts), then the first real Leica batch through
-  `add-photo`; masonry vs uniform decided with real photos.
+- The first real Leica batch through `add-photo`; masonry vs uniform
+  decided with real photos. (The photo room still shows its three seeded
+  fixtures; hide them the day real prints hang.)
 - Gallery og:image + apple-touch-icon per room once real work hangs.
 - Sounds RSS with audio enclosures (podcast plumbing for free).
 - **Reruns**: every sound is deterministic, and its sidecar already stores
