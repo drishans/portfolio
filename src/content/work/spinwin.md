@@ -9,6 +9,7 @@ order: 5
 glyph: phases
 live: https://spinwin.fly.dev
 repo: https://github.com/drishans/spinwin
+topics: ['systems']
 draft: false
 ---
 

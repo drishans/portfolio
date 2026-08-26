@@ -44,6 +44,7 @@ export const TOPICS = {
   audio: 'Audio & acoustics',
   graphics: 'Graphics',
   compilers: 'Compilers',
+  systems: 'Systems',
   scicomp: 'Scientific computing',
   optimization: 'Optimization',
   ai: 'AI / ML',
