@@ -1,0 +1,17 @@
+---
+/**
+ * The draft marker. Only ever rendered in draft mode (`npm run dev:drafts`),
+ * where its whole job is to be impossible to miss: a draft that reads as
+ * published is how an unfinished note gets quoted.
+ *
+ * Styles live in src/dev/draft-mode.css, which Base.astro inlines only in
+ * draft mode — a scoped <style> here would ship on every production page.
+ */
+interface Props {
+  /** Nothing renders when false, so callers pass the flag straight through. */
+  draft?: boolean;
+}
+const { draft = false } = Astro.props;
+---
+
+{draft && <span class="draft-chip">Draft</span>}

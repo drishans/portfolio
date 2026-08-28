@@ -1,16 +1,19 @@
 ---
 // Writing index row — one "field note" line.
 import { formatDate } from '../utils';
+import DraftChip from './DraftChip.astro';
 
 interface Props {
-  no: string;        // entry number, e.g. "01"
+  no: string;        // entry number, e.g. "01" — "—" for a draft, which has none yet
   title: string;
   href: string;
   date: Date;
   minutes: number;
   tags?: string[];
+  /** Draft mode only; nothing renders outside it. */
+  draft?: boolean;
 }
-const { no, title, href, date, minutes, tags = [] } = Astro.props;
+const { no, title, href, date, minutes, tags = [], draft = false } = Astro.props;
 const stamp = formatDate(date, 'short');
 const iso = date.toISOString();
 ---
@@ -18,6 +21,9 @@ const iso = date.toISOString();
   <span class="note__no">№{no}</span>
   <span class="note__main">
     <span class="note__title">{title}</span>
+    {/* Renders nothing unless draft mode is on, so the published markup here
+        is exactly what it was before draft mode existed. */}
+    <DraftChip draft={draft} />
     {tags.length > 0 && <span class="note__tags">{tags.slice(0, 3).join(' · ')}</span>}
   </span>
   <span class="note__meta">
