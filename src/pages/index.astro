@@ -50,6 +50,7 @@ const writing = allWriting.slice(0, 4);
             stack={p.data.stack}
             glyph={p.data.glyph}
             href={`/work/${slugOf(p.id)}/`}
+            draft={p.data.draft}
           />
         ))}
       </div>
@@ -74,6 +75,7 @@ const writing = allWriting.slice(0, 4);
             date={post.data.pubDate}
             minutes={readingMinutes(post.body)}
             tags={post.data.tags}
+            draft={post.data.draft}
           />
         ))}
         <div class="notes__cap"></div>

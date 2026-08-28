@@ -4,6 +4,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import sitemap from '@astrojs/sitemap';
 import expressiveCode from 'astro-expressive-code';
 import { temmlMath, tableWrap } from './src/lib/satteri-plugins.mjs';
+import draftTools from './src/dev/drafts-plugin.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -47,5 +48,8 @@ export default defineConfig({
     }),
     sitemap(),
   ],
+  // Draft mode's write side. The plugin gates itself to the dev server with
+  // DRAFT_MODE set, so `astro build` never loads it.
+  vite: { plugins: [draftTools()] },
   build: { format: 'directory' },
 });

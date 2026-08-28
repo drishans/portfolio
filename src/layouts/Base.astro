@@ -2,6 +2,12 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import DraftBar from '../dev/DraftBar.astro';
+import { SHOW_DRAFTS } from '../utils';
+// ?raw keeps this a build-time string rather than a stylesheet Astro would
+// extract and attach to every page. It reaches the browser only through the
+// conditional <style is:inline> below, which draft mode alone renders.
+import draftModeCss from '../dev/draft-mode.css?raw';
 
 interface Props {
   title?: string;
@@ -11,8 +17,14 @@ interface Props {
   type?: 'website' | 'article';
   publishedTime?: Date;
   modifiedTime?: Date;
+  /**
+   * Draft mode only: the content entry this page renders, so the draft bar can
+   * flip its flag. Layouts that wrap a single entry (Post, Project) pass it;
+   * index pages have nothing single to flip and leave it off.
+   */
+  draftOf?: { collection: string; id: string; draft: boolean };
 }
-const { title, description, image, imageAlt, type, publishedTime, modifiedTime } = Astro.props;
+const { title, description, image, imageAlt, type, publishedTime, modifiedTime, draftOf } = Astro.props;
 ---
 
 <!doctype html>
@@ -27,6 +39,7 @@ const { title, description, image, imageAlt, type, publishedTime, modifiedTime }
       publishedTime={publishedTime}
       modifiedTime={modifiedTime}
     />
+    {SHOW_DRAFTS && <style is:inline set:html={draftModeCss} />}
   </head>
   <body>
     <span id="top"></span>
@@ -37,5 +50,6 @@ const { title, description, image, imageAlt, type, publishedTime, modifiedTime }
       <slot />
     </main>
     <Footer />
+    {draftOf && <DraftBar {...draftOf} />}
   </body>
 </html>
