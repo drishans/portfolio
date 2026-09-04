@@ -5,7 +5,7 @@ role: Early engineer
 stack: ['Vertex AI', 'ADK', 'RAG', 'SAP BTP', 'Joule']
 year: 2025
 length: 'Ongoing'
-order: 3
+order: 4
 glyph: spectrum
 topics: ['ai']
 draft: true
