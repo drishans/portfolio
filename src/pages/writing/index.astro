@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import NoteRow from '../../components/NoteRow.astro';
+import SeriesShelf from '../../components/SeriesShelf.astro';
 import { getPublished, byDate, readingMinutes, noteNumbers, slugOf } from '../../utils';
 import { SITE, TOPICS, type TopicSlug } from '../../consts';
 
@@ -42,6 +43,14 @@ const years = [...groups.keys()].sort((a, b) => b - a);
         )}
       </header>
 
+      <section class="tutorials" aria-labelledby="tutorials-label">
+        <div class="tutorials__head">
+          <p id="tutorials-label" class="year__label mono">Tutorial series</p>
+          <a class="tutorials__all mono" href="/series/">All series →</a>
+        </div>
+        <SeriesShelf />
+      </section>
+
       {years.map((year) => (
         <section class="year">
           <p class="year__label mono">{year}</p>
@@ -80,6 +89,17 @@ const years = [...groups.keys()].sort((a, b) => b - a);
     transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
   }
   .filters__chip:hover { color: var(--signal); border-color: var(--hair-bright); }
+
+  .tutorials { margin-bottom: var(--s-6); }
+  .tutorials__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  .tutorials__all { color: var(--silver-dim); transition: color 0.2s var(--ease); }
+  .tutorials__all:hover { color: var(--signal); }
 
   .year { margin-bottom: var(--s-5); }
   .year__label {

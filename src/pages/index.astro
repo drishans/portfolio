@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import GrainField from '../components/GrainField.astro';
 import PlateCard from '../components/PlateCard.astro';
 import NoteRow from '../components/NoteRow.astro';
+import SeriesShelf from '../components/SeriesShelf.astro';
 import { getPublished, byOrder, byDate, readingMinutes, pad, noteNumbers, slugOf } from '../utils';
 import { SITE } from '../consts';
 
@@ -48,6 +49,18 @@ const writing = allWriting.slice(0, 4);
           />
         ))}
       </div>
+    </div>
+  </section>
+
+  <!-- SERIES: the tutorials, one click from the landing page -->
+  <section class="section section--tight">
+    <div class="wrap">
+      <div class="head2">
+        <p class="eyebrow">Tutorials</p>
+        <h2 class="head2__title">Series</h2>
+        <a href="/series/" class="head2__all mono">All series →</a>
+      </div>
+      <SeriesShelf limit={3} />
     </div>
   </section>
 
