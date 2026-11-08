@@ -9,7 +9,7 @@ order: 2
 glyph: phases
 topics: ['compilers', 'quantum']
 repo: https://github.com/drishans/qcc
-draft: true
+draft: false
 ---
 
 qcc is a working optimizing compiler for quantum circuits, built small enough

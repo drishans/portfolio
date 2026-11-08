@@ -3,6 +3,7 @@ title: The Scanner Went Down Mid-Event
 description: A static import, a missing build step, and a 30-second triage from a phone
 pubDate: 2026-06-12
 tags: ['rust', 'wasm', 'postmortem', 'deploy']
+topics: ['systems']
 draft: false
 ---
 

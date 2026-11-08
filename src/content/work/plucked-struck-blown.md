@@ -5,7 +5,7 @@ role: Everything
 stack: ['Faust', 'WebAssembly', 'AudioWorklet', 'Node', 'PyTorch', 'CUDA']
 year: 2026
 length: 'one long night, then curation'
-order: 5
+order: 6
 glyph: contour
 topics: ['audio', 'scicomp']
 repo: https://github.com/drishans/plucked-struck-blown

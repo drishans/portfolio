@@ -3,7 +3,7 @@ title: Fitting a bell with four thousand guesses
 description: "The capstone: a differentiable copy of the modal bar, a loss that had to be taught to hear decay, and a GPU running thousands of random initializations in parallel until one of them finds the physics."
 pubDate: 2026-07-11
 tags: ['audio', 'ai', 'pytorch', 'cuda', 'dsp', 'optimization']
-topics: ['audio', 'ai', 'scicomp']
+topics: ['audio', 'ai', 'scicomp', 'optimization']
 series:
   id: plucked-struck-blown
   part: 3

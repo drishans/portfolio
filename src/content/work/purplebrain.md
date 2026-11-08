@@ -5,7 +5,7 @@ role: Engineer
 stack: ['Max/MSP', 'DSP', 'Real-time audio', 'EEG']
 year: 2025
 length: '~4 months'
-order: 2
+order: 3
 glyph: waveform
 topics: ['audio']
 draft: false
