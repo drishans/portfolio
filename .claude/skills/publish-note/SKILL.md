@@ -35,6 +35,9 @@ like scaffold text he has not touched, stop and ask before proceeding.
    `curl -s https://drishan.com/writing/<slug>/ -o /dev/null -w "%{http_code}"`
    should print 200.
 
+8. If this was the final part of a series: invoke the `share-note` skill
+   for the distribution drafts (HN, one X post, one LinkedIn post).
+
 ## Never
 
 - Never publish a note Drishan has not rewritten.
