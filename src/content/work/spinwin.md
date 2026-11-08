@@ -5,7 +5,7 @@ role: Solo build
 stack: ['Rust', 'Axum', 'SQLite', 'WebAssembly', 'JavaScript', 'Ed25519']
 year: 2026
 length: Live event
-order: 4
+order: 7
 glyph: phases
 live: https://spinwin.fly.dev
 repo: https://github.com/drishans/spinwin
