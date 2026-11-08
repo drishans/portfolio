@@ -1,0 +1,85 @@
+---
+/**
+ * The tutorial series as a row of cards, newest activity first. Used on the
+ * homepage and atop /writing/ so the series are one click from anywhere a
+ * reader starts. Same visibility rule as /series/: a series shows up once it
+ * has at least one published part.
+ */
+import { getPublished } from '../utils';
+import { TOPICS } from '../consts';
+
+interface Props {
+  /** Show at most this many series (newest first). Omit for all. */
+  limit?: number;
+}
+const { limit } = Astro.props;
+
+const LEVELS = { intro: 'Intro', working: 'Working knowledge', advanced: 'Advanced' } as const;
+
+const writing = await getPublished('writing');
+const shelf = (await getPublished('series'))
+  .map((s) => {
+    const parts = writing.filter((p) => p.data.series?.id.id === s.id);
+    const latest = Math.max(0, ...parts.map((p) => p.data.pubDate.getTime()));
+    return { s, parts: parts.length, latest };
+  })
+  .filter((r) => r.parts > 0)
+  .sort((a, b) => b.latest - a.latest)
+  .slice(0, limit ?? Infinity);
+---
+
+{shelf.length > 0 && (
+  <div class="shelf">
+    {shelf.map(({ s, parts }) => (
+      <a class="shelf__card" href={`/series/${s.id}/`}>
+        <span class="shelf__meta mono">
+          {parts} {parts === 1 ? 'part' : 'parts'}
+          <span class="shelf__sep">/</span>
+          {LEVELS[s.data.level]}
+        </span>
+        <span class="shelf__title">{s.data.title}</span>
+        <span class="shelf__desc">{s.data.description}</span>
+        {s.data.topics.length > 0 && (
+          <span class="shelf__topics mono">{s.data.topics.map((t) => TOPICS[t]).join(' · ')}</span>
+        )}
+      </a>
+    ))}
+  </div>
+)}
+
+<style>
+  .shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--s-3);
+  }
+  .shelf__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.2rem 1.3rem;
+    background: var(--ink-2);
+    border: 1px solid var(--hair);
+    border-radius: var(--radius);
+    transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  }
+  .shelf__card:hover { border-color: var(--hair-bright); transform: translateY(-2px); }
+  .shelf__meta { color: var(--mid); display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .shelf__sep { color: var(--hair-bright); }
+  .shelf__title {
+    font-family: var(--display);
+    font-variation-settings: 'opsz' 60, 'wght' 540, 'SOFT' 0, 'WONK' 0;
+    font-size: var(--step-1);
+    line-height: 1.15;
+    color: var(--silver);
+    transition: color 0.2s var(--ease);
+  }
+  .shelf__card:hover .shelf__title { color: var(--signal); }
+  .shelf__desc {
+    color: var(--silver-dim);
+    font-size: var(--step--1);
+    line-height: 1.55;
+    flex: 1;
+  }
+  .shelf__topics { color: var(--mid); margin-top: 0.2rem; }
+</style>

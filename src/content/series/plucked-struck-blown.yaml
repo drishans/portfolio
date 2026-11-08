@@ -4,6 +4,7 @@ description: >-
   Three musical instruments built from physics instead of samples: a wire, a
   bar, and a pipe in ~60 lines of Faust each, compiled to WebAssembly small
   enough to hand to a browser, then reverse-engineered by gradient descent.
+project: plucked-struck-blown
 level: working
 topics: ['audio', 'scicomp']
 prerequisites:

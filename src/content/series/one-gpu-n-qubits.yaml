@@ -4,6 +4,7 @@ description: >-
   How far quantum simulation goes on one consumer graphics card. cuQuantum,
   the memory wall, and the escape routes past it. Measured honestly, on a desk,
   no cluster in sight.
+project: one-gpu-n-qubits
 level: working
 topics: ['quantum', 'scicomp']
 prerequisites:
