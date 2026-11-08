@@ -1,0 +1,14 @@
+# A series is one YAML file; posts join it via their `series` frontmatter field.
+title: A Language for Wobble Bass
+description: >-
+  Building a tiny compiled language around a single performance gesture: the
+  LFO rate knob. A hand-written Rust front end, a reference interpreter that
+  doubles as the specification, and hand-emitted WebAssembly small enough to
+  play in a browser tab.
+level: working
+topics: ['compilers', 'audio']
+prerequisites:
+  - Comfort reading code; no compilers background assumed
+  - Roughly what an oscillator, an LFO, and a lowpass filter do
+  - A browser for the playable parts
+draft: true
