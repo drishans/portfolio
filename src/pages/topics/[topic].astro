@@ -73,6 +73,7 @@ const series = (await getPublished('series')).filter(
                 stack={p.data.stack}
                 glyph={p.data.glyph}
                 href={`/work/${slugOf(p.id)}/`}
+                draft={p.data.draft}
                 headingLevel="h3"
               />
             ))}
@@ -92,6 +93,7 @@ const series = (await getPublished('series')).filter(
                 date={post.data.pubDate}
                 minutes={readingMinutes(post.body)}
                 tags={post.data.tags}
+                draft={post.data.draft}
               />
             ))}
           </div>

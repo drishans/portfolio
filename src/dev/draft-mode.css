@@ -1,0 +1,80 @@
+/* =========================================================================
+   Draft mode's stylesheet: the chip on listings and the control bar on an
+   entry page. Loaded once, inline, by Base.astro, and only when
+   `npm run dev:drafts` is what started the server.
+
+   It lives in one file rather than in <style> blocks on DraftChip and
+   DraftBar because Astro extracts component styles into the page's
+   stylesheet whenever the component is in the render graph, conditional or
+   not — so scoped blocks put ~1.3 KB of unreachable CSS on every production
+   page. Class names are namespaced `draft-*` to stand in for the scoping
+   this gives up.
+
+   Tokens come from global.css, same as everything else.
+   ========================================================================= */
+
+.draft-chip {
+  /* align-self keeps it from stretching to the full width of the flex column
+     it sits in on a note row; it is a tag, not a bar. */
+  align-self: flex-start;
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 0.28em 0.5em;
+  color: var(--signal);
+  border: 1px solid var(--signal);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--signal) 14%, transparent);
+  vertical-align: 0.08em;
+}
+
+.draft-bar {
+  position: fixed;
+  left: clamp(0.75rem, 3vw, 1.5rem);
+  bottom: clamp(0.75rem, 3vw, 1.5rem);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  padding: 0.55rem 0.85rem;
+  max-width: calc(100vw - 1.5rem);
+  background: color-mix(in srgb, var(--ink-2) 94%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--hair-bright);
+  border-radius: var(--radius);
+}
+.draft-bar[data-draft='true'] { border-color: var(--signal); }
+
+.draft-bar__state { color: var(--mid); }
+.draft-bar[data-draft='true'] .draft-bar__state { color: var(--signal); }
+
+.draft-bar__path {
+  color: var(--mid);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.draft-bar__flip {
+  background: transparent;
+  border: 1px solid var(--hair-bright);
+  border-radius: var(--radius);
+  color: var(--silver);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.draft-bar__flip:hover { border-color: var(--signal); color: var(--signal); }
+.draft-bar__flip:disabled { opacity: 0.4; cursor: progress; }
+
+.draft-bar__all { color: var(--mid); }
+.draft-bar__all:hover { color: var(--signal); }

@@ -17,9 +17,10 @@ is *field notes*. Project metadata is set like an instrument readout.
 
 ```bash
 npm install
-npm run dev      # local dev server at http://localhost:4321
-npm run build    # production build to ./dist
-npm run preview  # serve the production build locally
+npm run dev         # local dev server at http://localhost:4321
+npm run dev:drafts  # the same server with drafts visible and flippable
+npm run build       # production build to ./dist
+npm run preview     # serve the production build locally
 ```
 
 Requires Node 22+.
@@ -105,6 +106,27 @@ and line marks via ` ```py title="file.py" {3-4} `. Check the permanent-draft
 Field notes are sorted newest-first and grouped by year on the Writing page.
 Their №s are permanent (oldest = №01), which is why a newly published post
 should carry a fresh `pubDate`.
+
+## Draft mode
+
+`draft: true` hides a note or plate from the site, which also hides it from
+you. Draft mode gives it back without publishing anything:
+
+```bash
+npm run dev:drafts
+```
+
+Every listing then shows drafts alongside published work, marked with a chip
+and numbered `№—` (numbering still counts published posts only, so what you
+see matches production). A draft's own page renders, with a bar at the bottom
+naming its file and offering to flip the flag. `/__drafts` lists all three
+collections at once if you would rather work down a list.
+
+It is dev-only by construction: `astro build` compiles the whole feature out,
+including the endpoint that does the writing, and produces byte-identical
+output either way. The server also refuses any request that did not come from
+loopback, since `--host` would otherwise put a file-writing endpoint on your
+network.
 
 ## Adding a series
 
