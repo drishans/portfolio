@@ -63,13 +63,38 @@ the flag on disk, and `/__drafts` lists everything across the three
 collections. It exists so looking at a draft never means flipping the flag and
 flipping it back, which is how a stray `draft: false` gets committed.
 
+Entry pages (notes, plates, and series) also get a **Details** drawer that
+edits the rest of the frontmatter through `POST /__drafts/fields`. It rewrites
+only the keys that changed, each in the style that key already uses, and a new
+key in its siblings' style at its schema position (`src/dev/frontmatter.mjs`:
+`js-yaml` reads and verifies there, it never writes). A write is refused unless
+it round-trips exactly, passes the collection's real Zod schema (loaded through
+the dev server, not copied), and every `series`/`project` reference names a
+real entry, which `reference()` alone does not check. `draft` is not editable
+in the drawer; only the bar's Publish button sets it.
+
 `SHOW_DRAFTS` (`src/utils.ts`) is the one switch, and it is
 `import.meta.env.DEV && process.env.DRAFT_MODE === '1'`. The first half is a
 compile-time constant, so `astro build` folds the whole thing to `false` and
 drops every branch behind it: the production output is byte-identical with
-draft mode present or absent. Keep it that way — the pieces under `src/dev/`
-carry the rules that make it true (a `?raw` stylesheet rather than a scoped
-`<style>`, `is:inline` on the bar's script, and `apply` on the Vite plugin).
+draft mode present or absent. Keep it that way. Each of these rules exists
+because breaking it was measured to change production output or behaviour:
+
+- Draft styles live in `src/dev/draft-mode.css`, inlined via `?raw`. A scoped
+  `<style>` on a dev component ships to every page.
+- Dev components must not import a component that has a scoped `<style>`
+  either. Importing `Glyph` hoisted its rule into the shared stylesheet, which
+  is why the drawer's glyph drawings come from `/__drafts/glyphs` (rendered by
+  the dev server through Astro's container API) instead.
+- Scripts in dev components are `is:inline`; a plain `<script>` is hoisted
+  into the bundle.
+- `src/dev/drafts-plugin.mjs` imports only Node built-ins at load time.
+  `astro.config.mjs` imports it on every run, builds included, so anything
+  else (the YAML reader, the experimental container API) is loaded lazily
+  inside the handlers.
+- After a write, let the dev server's own HMR reload show the result. Calling
+  `location.reload()` first raced the content layer and rendered stale values.
+
 `npm run dev:drafts` goes through `scripts/dev-drafts.mjs` because Astro's own
 `--mode` flag reaches neither `import.meta.env.MODE` nor the Vite config as of
 Astro 7.0.7.
@@ -152,7 +177,8 @@ note). The slug routes pass a rendered `<Content />` into those layouts.
 series ships with `draft: true` on a `content/<slug>` branch; Drishan
 rewrites in his own voice and flips the flag himself, in his editor or through
 draft mode's bar. Claude never sets `draft: false` — not in a file, not through
-the `/__drafts` endpoint — and never pushes content to main. The step-by-step
+the `/__drafts` endpoints — and never pushes content to main. Testing the
+endpoints means throwaway fixtures, never the real content files. The step-by-step
 workflows live in `.claude/skills/` (`draft-note`, `publish-note`) — invoke them.
 
 Prose rules for anything drafted here:

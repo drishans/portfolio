@@ -1,0 +1,392 @@
+---
+/**
+ * Draft mode's details form: the frontmatter of the entry on screen, as fields,
+ * in a drawer beside the rendered page. Saving sends only the fields that
+ * changed to /__drafts/fields, which validates against the real schema and
+ * rewrites just those keys (see src/dev/frontmatter.mjs); the page then reloads
+ * with the edit applied. The body stays in your editor.
+ *
+ * FIELDS below is layout — which widget, in what order — not the contract. The
+ * schema in content.config.ts decides what is valid, enum options come from the
+ * same consts it uses, and a field the schema lacks is refused by the endpoint,
+ * so the form cannot quietly drift from what `astro build` enforces. A schema
+ * field left out here is simply not editable from the form.
+ *
+ * Rendered only inside DraftBar's draft-mode branch. No scoped <style> (they
+ * would ship to production; see draft-mode.css) and the script is is:inline.
+ *
+ * Nor may it import a component that has one. Importing Glyph here put Glyph's
+ * scoped rule into the shared stylesheet of every production page, so the
+ * picker's drawings are rendered by the dev server instead (/__drafts/glyphs,
+ * through Astro's container API) and inlined by the script.
+ */
+import { getCollection } from 'astro:content';
+import { TOPICS, GLYPHS } from '../consts';
+import { collections } from '../content.config';
+
+interface Props {
+  collection: 'writing' | 'work' | 'series';
+  id: string;
+  data: Record<string, any>;
+}
+const { collection, id, data } = Astro.props;
+
+type Kind =
+  | 'text' | 'textarea' | 'url' | 'date' | 'number'
+  | 'list' | 'lines' | 'topics' | 'glyph' | 'level' | 'series' | 'project';
+interface Field { key: string; label: string; kind: Kind; optional?: boolean; hint?: string }
+
+const FIELDS: Record<Props['collection'], Field[]> = {
+  writing: [
+    { key: 'title', label: 'Title', kind: 'text' },
+    { key: 'description', label: 'Description', kind: 'textarea' },
+    {
+      key: 'pubDate', label: 'Published', kind: 'date',
+      hint: 'Note numbers are permanent: when you publish, set this to the real day.',
+    },
+    { key: 'updatedDate', label: 'Updated', kind: 'date', optional: true },
+    { key: 'topics', label: 'Topics', kind: 'topics' },
+    { key: 'tags', label: 'Tags', kind: 'list', hint: 'Comma-separated.' },
+    { key: 'series', label: 'Series', kind: 'series', optional: true },
+  ],
+  work: [
+    { key: 'title', label: 'Title', kind: 'text' },
+    { key: 'summary', label: 'Summary', kind: 'textarea' },
+    { key: 'role', label: 'Role', kind: 'text' },
+    { key: 'year', label: 'Year', kind: 'number' },
+    { key: 'length', label: 'Length', kind: 'text', optional: true },
+    { key: 'order', label: 'Plate order', kind: 'number', hint: 'Lower comes first.' },
+    { key: 'glyph', label: 'Glyph', kind: 'glyph', optional: true },
+    { key: 'topics', label: 'Topics', kind: 'topics' },
+    { key: 'stack', label: 'Stack', kind: 'list', hint: 'Comma-separated. The plate shows the first three.' },
+    { key: 'repo', label: 'Repository', kind: 'url', optional: true },
+    { key: 'live', label: 'Live', kind: 'url', optional: true },
+  ],
+  series: [
+    { key: 'title', label: 'Title', kind: 'text' },
+    { key: 'description', label: 'Description', kind: 'textarea' },
+    { key: 'level', label: 'Level', kind: 'level' },
+    { key: 'topics', label: 'Topics', kind: 'topics' },
+    { key: 'project', label: 'Project plate', kind: 'project', optional: true },
+    { key: 'prerequisites', label: 'Prerequisites', kind: 'lines', hint: 'One per line.' },
+  ],
+};
+const fields = FIELDS[collection];
+
+// The values the form starts from, in the shape the endpoint speaks: dates as
+// YYYY-MM-DD, references as plain ids, absent optional fields as null. The
+// script diffs against exactly these, so an untouched field is never sent.
+const iso = (d: unknown) => (d instanceof Date ? d.toISOString().slice(0, 10) : null);
+const ref = (r: any) => (r && typeof r === 'object' ? r.id : r) ?? null;
+const initial: Record<string, unknown> = {};
+for (const f of fields) {
+  const v = data[f.key];
+  if (f.kind === 'date') initial[f.key] = iso(v);
+  else if (f.kind === 'series') initial[f.key] = v ? { id: ref(v.id), part: v.part } : null;
+  else if (f.kind === 'project') initial[f.key] = ref(v);
+  else if (['list', 'lines', 'topics'].includes(f.kind)) initial[f.key] = v ?? [];
+  else initial[f.key] = v ?? (f.optional ? null : '');
+}
+
+const levels: string[] = (collections.series.schema as any).shape.level.options;
+const allSeries = fields.some((f) => f.kind === 'series')
+  ? (await getCollection('series')).map((s) => ({ id: s.id, title: s.data.title, draft: s.data.draft }))
+  : [];
+const allWork = fields.some((f) => f.kind === 'project')
+  ? (await getCollection('work')).map((w) => ({ id: w.id, title: w.data.title, draft: w.data.draft }))
+  : [];
+const text = (v: unknown) => (v === null || v === undefined ? '' : String(v));
+---
+
+<aside class="draft-details" id="draft-details" hidden aria-labelledby="draft-details-title">
+  <header class="draft-details__head">
+    <h2 class="draft-details__title" id="draft-details-title">Details</h2>
+    <button class="draft-details__close" type="button" data-close aria-label="Close details">Close ×</button>
+  </header>
+  <p class="draft-details__file">{collection}/{id}</p>
+
+  <form
+    class="draft-form"
+    novalidate
+    data-collection={collection}
+    data-id={id}
+    data-initial={JSON.stringify(initial)}
+  >
+    {fields.map((f) => (
+      <div class="draft-form__field" data-field={f.key} data-kind={f.kind} data-optional={f.optional ? '' : undefined}>
+        <span class="draft-form__label" id={`df-${f.key}`}>
+          {f.label}{f.optional && <span class="draft-form__opt"> optional</span>}
+        </span>
+
+        {f.kind === 'text' && (
+          <input type="text" aria-labelledby={`df-${f.key}`} value={text(initial[f.key])} required={!f.optional} />
+        )}
+        {f.kind === 'url' && (
+          <input type="url" aria-labelledby={`df-${f.key}`} value={text(initial[f.key])} placeholder="https://" />
+        )}
+        {f.kind === 'textarea' && (
+          <textarea aria-labelledby={`df-${f.key}`} rows="4" required>{text(initial[f.key])}</textarea>
+        )}
+        {f.kind === 'date' && (
+          <input type="date" aria-labelledby={`df-${f.key}`} value={text(initial[f.key])} required={!f.optional} />
+        )}
+        {f.kind === 'number' && (
+          <input type="number" aria-labelledby={`df-${f.key}`} value={text(initial[f.key])} step="1" required={!f.optional} />
+        )}
+        {f.kind === 'list' && (
+          <input type="text" aria-labelledby={`df-${f.key}`} value={(initial[f.key] as string[]).join(', ')} />
+        )}
+        {f.kind === 'lines' && (
+          <textarea aria-labelledby={`df-${f.key}`} rows="4">{(initial[f.key] as string[]).join('\n')}</textarea>
+        )}
+
+        {f.kind === 'topics' && (
+          <div class="draft-form__chips" role="group" aria-labelledby={`df-${f.key}`}>
+            {Object.entries(TOPICS).map(([slug, name]) => (
+              <label class="draft-form__chip">
+                <input type="checkbox" value={slug} checked={(initial[f.key] as string[]).includes(slug)} />
+                {name}
+              </label>
+            ))}
+          </div>
+        )}
+
+        {f.kind === 'glyph' && (
+          <div class="draft-form__glyphs" role="radiogroup" aria-labelledby={`df-${f.key}`}>
+            {GLYPHS.map((g) => (
+              <label class="draft-form__glyph">
+                <input type="radio" name={`df-${f.key}`} value={g} checked={initial[f.key] === g} />
+                <span class="draft-form__glyph-art" data-glyph={g} aria-hidden="true"></span>
+                <span>{g}</span>
+              </label>
+            ))}
+            <label class="draft-form__glyph draft-form__glyph--none">
+              <input type="radio" name={`df-${f.key}`} value="" checked={!initial[f.key]} />
+              <span>none</span>
+            </label>
+          </div>
+        )}
+
+        {f.kind === 'level' && (
+          <div class="draft-form__chips" role="radiogroup" aria-labelledby={`df-${f.key}`}>
+            {levels.map((lv) => (
+              <label class="draft-form__chip">
+                <input type="radio" name={`df-${f.key}`} value={lv} checked={initial[f.key] === lv} />
+                {lv}
+              </label>
+            ))}
+          </div>
+        )}
+
+        {f.kind === 'series' && (
+          <div class="draft-form__row">
+            <select aria-labelledby={`df-${f.key}`}>
+              <option value="">Not in a series</option>
+              {allSeries.map((s) => (
+                <option value={s.id} selected={(initial[f.key] as any)?.id === s.id}>
+                  {s.title}{s.draft ? ' (draft)' : ''}
+                </option>
+              ))}
+            </select>
+            <label class="draft-form__part">
+              part
+              <input type="number" min="1" step="1" value={text((initial[f.key] as any)?.part ?? 1)} />
+            </label>
+          </div>
+        )}
+
+        {f.kind === 'project' && (
+          <select aria-labelledby={`df-${f.key}`}>
+            <option value="">No plate</option>
+            {allWork.map((w) => (
+              <option value={w.id} selected={initial[f.key] === w.id}>
+                {w.title}{w.draft ? ' (draft)' : ''}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {f.hint && <p class="draft-form__hint">{f.hint}</p>}
+        <p class="draft-form__error" aria-live="polite"></p>
+      </div>
+    ))}
+
+    <footer class="draft-form__foot">
+      <p class="draft-form__status" aria-live="polite"></p>
+      <button class="draft-form__save" type="submit">Save changes</button>
+    </footer>
+  </form>
+</aside>
+
+<script is:inline>
+  (() => {
+    const drawer = document.getElementById('draft-details');
+    const form = drawer?.querySelector('.draft-form');
+    if (!drawer || !form) return;
+    const initial = JSON.parse(form.dataset.initial);
+    const status = form.querySelector('.draft-form__status');
+    const save = form.querySelector('.draft-form__save');
+
+    // --- open / close -------------------------------------------------------
+    const opener = document.querySelector('[data-open-details]');
+    const open = () => {
+      drawer.hidden = false;
+      opener?.setAttribute('aria-expanded', 'true');
+      drawer.querySelector('input, textarea, select')?.focus();
+    };
+    const close = () => {
+      drawer.hidden = true;
+      opener?.setAttribute('aria-expanded', 'false');
+      opener?.focus();
+    };
+    opener?.addEventListener('click', () => (drawer.hidden ? open() : close()));
+    drawer.querySelector('[data-close]').addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !drawer.hidden) close();
+    });
+    // Reopen after a save's reload, so an edit-check-edit loop stays in place.
+    if (sessionStorage.getItem('draft-details-open') === location.pathname) {
+      sessionStorage.removeItem('draft-details-open');
+      open();
+    }
+
+    // The glyph drawings come from the dev server, rendered from Glyph.astro
+    // itself; without them the picker still works by name.
+    const arts = form.querySelectorAll('[data-glyph]');
+    if (arts.length) {
+      fetch('/__drafts/glyphs')
+        .then((r) => (r.ok ? r.json() : {}))
+        .then((svgs) => arts.forEach((a) => svgs[a.dataset.glyph] && (a.innerHTML = svgs[a.dataset.glyph])))
+        .catch(() => {});
+    }
+
+    // --- reading a field back into the endpoint's shape ------------------------
+    const split = (s, sep) => s.split(sep).map((x) => x.trim()).filter(Boolean);
+    function valueOf(field, was) {
+      const kind = field.dataset.kind;
+      const optional = field.hasAttribute('data-optional');
+      const el = field.querySelector('input:not([type=checkbox]):not([type=radio]), textarea, select');
+      switch (kind) {
+        case 'text':
+        case 'textarea':
+        case 'url':
+          return optional && el.value.trim() === '' ? null : el.value;
+        case 'date':
+          return el.value || null;
+        case 'number':
+          return el.value === '' ? null : Number(el.value);
+        case 'list':
+          return split(el.value, ',');
+        case 'lines':
+          return split(el.value, '\n');
+        case 'topics': {
+          // Keep the order already on disk and append new picks, so ticking
+          // one box doesn't also reorder the rest.
+          const on = [...field.querySelectorAll('input:checked')].map((i) => i.value);
+          return [...was.filter((t) => on.includes(t)), ...on.filter((t) => !was.includes(t))];
+        }
+        case 'glyph':
+        case 'level':
+          return field.querySelector('input:checked')?.value || null;
+        case 'project':
+          return el.value || null;
+        case 'series': {
+          const sid = field.querySelector('select').value;
+          const part = Number(field.querySelector('.draft-form__part input').value);
+          return sid ? { id: sid, part } : null;
+        }
+      }
+    }
+
+    function changes() {
+      const out = {};
+      for (const field of form.querySelectorAll('[data-field]')) {
+        const key = field.dataset.field;
+        const now = valueOf(field, initial[key] ?? []);
+        if (JSON.stringify(now) !== JSON.stringify(initial[key] ?? null)) out[key] = now;
+      }
+      return out;
+    }
+
+    function clearErrors() {
+      form.querySelectorAll('.draft-form__error').forEach((p) => (p.textContent = ''));
+      form.querySelectorAll('[data-invalid]').forEach((f) => f.removeAttribute('data-invalid'));
+      status.textContent = '';
+      status.removeAttribute('data-tone');
+    }
+
+    function say(message, tone) {
+      status.textContent = message;
+      if (tone) status.dataset.tone = tone;
+    }
+
+    // Unsaved edits are easy to lose to a stray reload; say so on the button.
+    form.addEventListener('input', () => {
+      const n = Object.keys(changes()).length;
+      save.textContent = n ? `Save ${n} change${n === 1 ? '' : 's'}` : 'Save changes';
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+      const diff = changes();
+      if (Object.keys(diff).length === 0) return say('Nothing has changed.');
+
+      save.disabled = true;
+      say('Saving…');
+      let res, body;
+      try {
+        res = await fetch('/__drafts/fields', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ collection: form.dataset.collection, id: form.dataset.id, changes: diff }),
+        });
+        body = await res.json().catch(() => ({}));
+      } catch {
+        save.disabled = false;
+        return say('The dev server did not answer. Is npm run dev:drafts still running?', 'error');
+      }
+
+      if (res.ok) {
+        if (!body.changed?.length) {
+          save.disabled = false;
+          return say('Already up to date.');
+        }
+        say(`Saved ${body.changed.join(', ')}. Reloading…`);
+        sessionStorage.setItem('draft-details-open', location.pathname);
+        // No location.reload() here. The dev server reloads the page itself once
+        // the content layer has re-read the file (the same reload an edit in
+        // your editor gets); reloading first raced it and rendered the old
+        // values, which then became the form's stale starting point. The timer
+        // only covers a dropped HMR connection.
+        setTimeout(() => location.reload(), 5000);
+        return;
+      }
+
+      save.disabled = false;
+      const unplaced = [];
+      const named = new Set();
+      for (const issue of body.issues ?? []) {
+        const field = form.querySelector(`[data-field="${issue.path?.[0]}"]`);
+        if (field) {
+          field.setAttribute('data-invalid', '');
+          named.add(field.querySelector('.draft-form__label').firstChild.textContent.trim());
+          const slot = field.querySelector('.draft-form__error');
+          slot.textContent = slot.textContent ? `${slot.textContent} ${issue.message}` : issue.message;
+        } else {
+          unplaced.push(issue.message);
+        }
+      }
+      // Name the fields in the status too: the footer is always in view, the
+      // field with the detailed message may not be.
+      const detail = [...unplaced, ...(body.problems ?? [])].join(' ');
+      say(
+        body.issues?.length
+          ? `Not saved: check ${[...named].join(', ') || 'the fields'}. ${detail}`.trim()
+          : `Not saved: ${body.error ?? res.statusText}. ${detail}`.trim(),
+        'error',
+      );
+      form.querySelector('[data-invalid] input, [data-invalid] textarea, [data-invalid] select')?.focus();
+    });
+  })();
+</script>

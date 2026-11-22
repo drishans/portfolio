@@ -37,7 +37,7 @@ const relatedSeries = (await getPublished('series')).filter(
   type="article"
   image={`/og/work/${slugOf(entry.id)}.png`}
   imageAlt={`Work plate: ${d.title}`}
-  draftOf={{ collection: 'work', id: entry.id, draft: d.draft }}
+  draftOf={{ collection: 'work', id: entry.id, draft: d.draft, data: d }}
 >
   <article class="section">
     <div class="wrap">

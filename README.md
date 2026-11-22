@@ -122,6 +122,14 @@ see matches production). A draft's own page renders, with a bar at the bottom
 naming its file and offering to flip the flag. `/__drafts` lists all three
 collections at once if you would rather work down a list.
 
+The same bar has a **Details** button for the rest of the frontmatter: a
+drawer beside the page with the title, description and dates, topic chips, a
+series picker, the plate glyphs drawn as they appear on the cards, and so on.
+Saving checks the edit against the real content schema first, writes only the
+fields you changed (each in the style the file already uses, so the diff stays
+one line per field), and the page reloads with the edit applied. The body stays
+in your editor.
+
 It is dev-only by construction: `astro build` compiles the whole feature out,
 including the endpoint that does the writing, and produces byte-identical
 output either way. The server also refuses any request that did not come from

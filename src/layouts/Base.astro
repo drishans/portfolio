@@ -19,10 +19,16 @@ interface Props {
   modifiedTime?: Date;
   /**
    * Draft mode only: the content entry this page renders, so the draft bar can
-   * flip its flag. Layouts that wrap a single entry (Post, Project) pass it;
-   * index pages have nothing single to flip and leave it off.
+   * flip its flag and the Details drawer can edit it. Pages that render a
+   * single entry (Post, Project, a series page) pass it; index pages have
+   * nothing single to flip and leave it off.
    */
-  draftOf?: { collection: string; id: string; draft: boolean };
+  draftOf?: {
+    collection: 'writing' | 'work' | 'series';
+    id: string;
+    draft: boolean;
+    data?: Record<string, any>;
+  };
 }
 const { title, description, image, imageAlt, type, publishedTime, modifiedTime, draftOf } = Astro.props;
 ---

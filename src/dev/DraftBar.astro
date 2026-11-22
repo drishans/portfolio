@@ -1,7 +1,8 @@
 ---
 /**
- * Draft mode's control bar: which file this page came from, and a button that
- * flips its `draft` flag on disk. Rendered only under `npm run dev:drafts`, by
+ * Draft mode's control bar: which file this page came from, a button that
+ * flips its `draft` flag on disk, and a Details drawer for the rest of its
+ * frontmatter (DetailsForm). Rendered only under `npm run dev:drafts`, by
  * Base.astro, for the layouts that pass a `draftOf`.
  *
  * Styles live in src/dev/draft-mode.css (see the note there).
@@ -13,18 +14,22 @@
  * else, which means it disappears along with the branch around it.
  */
 import { SHOW_DRAFTS } from '../utils';
+import DetailsForm from './DetailsForm.astro';
 
 interface Props {
   /** Content collection this page renders from. */
-  collection: string;
+  collection: 'writing' | 'work' | 'series';
   /** Entry id, the loader's path-without-extension (folders included). */
   id: string;
   draft: boolean;
+  /** The entry's parsed frontmatter; without it there is no Details drawer. */
+  data?: Record<string, any>;
 }
-const { collection, id, draft } = Astro.props;
+const { collection, id, draft, data } = Astro.props;
 ---
 
 {SHOW_DRAFTS && (
+  <>
   <aside class="draft-bar" data-draft={draft ? 'true' : 'false'} aria-label="Draft controls">
     <span class="draft-bar__state mono">{draft ? 'Draft' : 'Live'}</span>
     <span class="draft-bar__path mono">{collection}/{id}</span>
@@ -37,8 +42,21 @@ const { collection, id, draft } = Astro.props;
     >
       {draft ? 'Publish →' : '← Back to draft'}
     </button>
+    {data && (
+      <button
+        class="draft-bar__details mono"
+        type="button"
+        data-open-details
+        aria-controls="draft-details"
+        aria-expanded="false"
+      >
+        Details
+      </button>
+    )}
     <a class="draft-bar__all mono" href="/__drafts">All drafts</a>
   </aside>
+
+  {data && <DetailsForm collection={collection} id={id} data={data} />}
 
   <script is:inline>
     document.querySelector('.draft-bar__flip')?.addEventListener('click', async (event) => {
@@ -66,5 +84,6 @@ const { collection, id, draft } = Astro.props;
       setTimeout(() => location.reload(), 5000);
     });
   </script>
+  </>
 )}
 
