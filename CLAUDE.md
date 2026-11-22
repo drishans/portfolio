@@ -14,9 +14,10 @@ reading several files.
 ## Commands
 
 ```bash
-npm run dev      # dev server at http://localhost:4321
-npm run build    # static build to ./dist (also fails on content-schema errors)
-npm run preview  # serve the built ./dist locally
+npm run dev         # dev server at http://localhost:4321
+npm run dev:drafts  # the same server with draft mode on (see below)
+npm run build       # static build to ./dist (also fails on content-schema errors)
+npm run preview     # serve the built ./dist locally
 ```
 
 There is **no test, lint, or type-check tooling installed** — no ESLint,
@@ -26,7 +27,7 @@ facto check: Astro validates every content file against the schema and fails the
 build on a bad frontmatter field, so build after editing content or schemas.
 After touching the rendering stack (math, code blocks, prose CSS), eyeball
 `/writing/kitchen-sink` — a permanent `draft: true` page that exercises every
-feature; flip its flag locally to view it, never commit the flip.
+feature. Reach it with `npm run dev:drafts`; never flip its flag to look at it.
 
 **Dependencies:** we develop on Windows but Cloudflare builds on Linux. When
 changing deps, edit `package.json` and let `.github/workflows/relock.yml`
@@ -56,6 +57,48 @@ index pages read the same collections.
 from `src/utils.ts` — never raw `getCollection` — and new listings can't leak
 drafts.
 
+**Draft mode** (`npm run dev:drafts`) is the audition loop: every listing
+renders drafts marked with a `<DraftChip />`, entry pages get a bar that flips
+the flag on disk, and `/__drafts` lists everything across the three
+collections. It exists so looking at a draft never means flipping the flag and
+flipping it back, which is how a stray `draft: false` gets committed.
+
+Entry pages (notes, plates, and series) also get a **Details** drawer that
+edits the rest of the frontmatter through `POST /__drafts/fields`. It rewrites
+only the keys that changed, each in the style that key already uses, and a new
+key in its siblings' style at its schema position (`src/dev/frontmatter.mjs`:
+`js-yaml` reads and verifies there, it never writes). A write is refused unless
+it round-trips exactly, passes the collection's real Zod schema (loaded through
+the dev server, not copied), and every `series`/`project` reference names a
+real entry, which `reference()` alone does not check. `draft` is not editable
+in the drawer; only the bar's Publish button sets it.
+
+`SHOW_DRAFTS` (`src/utils.ts`) is the one switch, and it is
+`import.meta.env.DEV && process.env.DRAFT_MODE === '1'`. The first half is a
+compile-time constant, so `astro build` folds the whole thing to `false` and
+drops every branch behind it: the production output is byte-identical with
+draft mode present or absent. Keep it that way. Each of these rules exists
+because breaking it was measured to change production output or behaviour:
+
+- Draft styles live in `src/dev/draft-mode.css`, inlined via `?raw`. A scoped
+  `<style>` on a dev component ships to every page.
+- Dev components must not import a component that has a scoped `<style>`
+  either. Importing `Glyph` hoisted its rule into the shared stylesheet, which
+  is why the drawer's glyph drawings come from `/__drafts/glyphs` (rendered by
+  the dev server through Astro's container API) instead.
+- Scripts in dev components are `is:inline`; a plain `<script>` is hoisted
+  into the bundle.
+- `src/dev/drafts-plugin.mjs` imports only Node built-ins at load time.
+  `astro.config.mjs` imports it on every run, builds included, so anything
+  else (the YAML reader, the experimental container API) is loaded lazily
+  inside the handlers.
+- After a write, let the dev server's own HMR reload show the result. Calling
+  `location.reload()` first raced the content layer and rendered stale values.
+
+`npm run dev:drafts` goes through `scripts/dev-drafts.mjs` because Astro's own
+`--mode` flag reaches neither `import.meta.env.MODE` nor the Vite config as of
+Astro 7.0.7.
+
 **Topics are the navigation axis.** `TOPICS` in `src/consts.ts` (slug →
 display name) drives the Zod enum, the `/topics/` index, and per-topic hub
 pages that aggregate work + writing + series. A hub only renders once its
@@ -65,7 +108,9 @@ topic has published work or writing, so adding a topic is one line.
 then recent year), `byDate` (writing: newest first), `pad` (1-based index →
 `"01"`), `noteNumbers` (stable note №s: oldest post = №01 — when publishing a
 draft, set its `pubDate` to the actual publish date; backdating renumbers
-every newer note), `plateNumbers` (one number per plate on every page),
+every newer note. Counted over published posts only, so draft mode shows the
+production numbering and a draft shows `№—`), `plateNumbers` (one number per
+plate on every page),
 `readingMinutes` (~200 wpm, code fences excluded),
 `formatDate` (**always UTC** — authored dates parse as UTC midnight, so
 local-timezone formatting would shift them a day between dev and CI). Plate
@@ -130,9 +175,11 @@ note). The slug routes pass a rendered `<Content />` into those layouts.
 
 **Claude scaffolds, Drishan publishes.** Every drafted note, plate, or
 series ships with `draft: true` on a `content/<slug>` branch; Drishan
-rewrites in his own voice and flips the flag himself. Never set
-`draft: false`, never push content to main. The step-by-step workflows
-live in `.claude/skills/` (`draft-note`, `publish-note`) — invoke them.
+rewrites in his own voice and flips the flag himself, in his editor or through
+draft mode's bar. Claude never sets `draft: false` — not in a file, not through
+the `/__drafts` endpoints — and never pushes content to main. Testing the
+endpoints means throwaway fixtures, never the real content files. The step-by-step
+workflows live in `.claude/skills/` (`draft-note`, `publish-note`) — invoke them.
 
 Prose rules for anything drafted here:
 

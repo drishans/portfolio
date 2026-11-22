@@ -54,6 +54,7 @@ const years = [...groups.keys()].sort((a, b) => b - a);
                 date={post.data.pubDate}
                 minutes={readingMinutes(post.body)}
                 tags={post.data.tags}
+                draft={post.data.draft}
               />
             ))}
           </div>

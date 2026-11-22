@@ -30,6 +30,7 @@ const work = (await getPublished('work')).sort(byOrder);
             stack={p.data.stack}
             glyph={p.data.glyph}
             href={`/work/${slugOf(p.id)}/`}
+            draft={p.data.draft}
             headingLevel="h2"
           />
         ))}

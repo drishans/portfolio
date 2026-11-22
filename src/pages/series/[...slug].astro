@@ -34,7 +34,11 @@ const rows = [
 ];
 ---
 
-<Base title={`${d.title} — Series`} description={d.description}>
+<Base
+  title={`${d.title} — Series`}
+  description={d.description}
+  draftOf={{ collection: 'series', id: entry.id, draft: d.draft, data: d }}
+>
   <section class="section">
     <div class="wrap">
       <a href="/series/" class="back mono">← All series</a>
@@ -74,6 +78,7 @@ const rows = [
                 date={post.data.pubDate}
                 minutes={readingMinutes(post.body)}
                 tags={post.data.tags}
+                draft={post.data.draft}
               />
             ))}
           </div>
