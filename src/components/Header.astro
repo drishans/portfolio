@@ -82,4 +82,21 @@ const isActive = (href: string) =>
     color: var(--signal);
     border-top-color: var(--signal);
   }
+
+  /* Four nav items plus the wordmark don't fit a phone at desktop spacing. */
+  @media (max-width: 520px) {
+    .hdr__row { gap: 0.9rem; }
+    .hdr__nav { gap: 0.8rem; }
+    .hdr__link { letter-spacing: 0.06em; }
+  }
+  @media (max-width: 400px) {
+    .hdr__row { gap: 0.6rem; }
+    .hdr__nav { gap: 0.6rem; }
+    .hdr__link { letter-spacing: 0.02em; }
+    .hdr__name { letter-spacing: 0.03em; }
+  }
+  @media (max-width: 345px) {
+    .hdr__dot { display: none; }
+    .hdr__name { font-size: 0.95rem; }
+  }
 </style>

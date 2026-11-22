@@ -1,10 +1,15 @@
 // Single source of truth for site metadata. Edit these and the whole site updates.
 
+const FIRST_NAME = 'Drishan';
+const LAST_NAME = 'Sarkar';
+
 export const SITE = {
-  /** Your name — used in the wordmark and as the OG site name. */
-  author: 'Drishan',
+  /** First name: the header wordmark, About greeting, and OG site name. */
+  author: FIRST_NAME,
+  /** Full name: the homepage hero. */
+  fullName: `${FIRST_NAME} ${LAST_NAME}`,
   /** Browser tab title / OG site title. */
-  title: 'Drishan Sarkar -- Quantum · AI · Systems',
+  title: `${FIRST_NAME} ${LAST_NAME} -- Quantum · AI · Systems`,
   /** Default meta description and RSS feed description. */
   description:
     'Engineer working across quantum computing, AI systems, and the low-level glue between them. Selected work and writing.',
