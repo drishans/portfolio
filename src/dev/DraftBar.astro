@@ -59,9 +59,11 @@ const { collection, id, draft } = Astro.props;
         alert('Could not flip that: ' + error);
         return;
       }
-      // The file changed, so the content layer is about to reload anyway;
-      // reloading here just makes the bar agree with it immediately.
-      location.reload();
+      // Let the dev server's own reload show the result: it fires once the
+      // content layer has re-read the file. Reloading here first raced it and
+      // could show the old state. The timer only covers a dropped HMR socket.
+      el.textContent = 'Reloading…';
+      setTimeout(() => location.reload(), 5000);
     });
   </script>
 )}

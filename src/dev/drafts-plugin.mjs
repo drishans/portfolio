@@ -98,6 +98,34 @@ const isLoopback = (req) => {
   return addr === '127.0.0.1' || addr === '::1' || addr === '::ffff:127.0.0.1';
 };
 
+/**
+ * Collect a JSON request body, refusing anything over `limit` bytes. An
+ * oversized body is drained and discarded rather than the socket destroyed,
+ * so the client gets a 413 instead of a dropped connection.
+ */
+function readJson(req, limit) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    let over = false;
+    req.on('data', (c) => {
+      if (over) return;
+      body += c;
+      if (body.length > limit) {
+        over = true;
+        reject(Object.assign(new Error(`body over ${limit} bytes`), { status: 413 }));
+      }
+    });
+    req.on('end', () => {
+      if (over) return;
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        reject(Object.assign(new Error('expected a JSON body'), { status: 400 }));
+      }
+    });
+  });
+}
+
 const send = (res, code, body, type = 'application/json') => {
   res.statusCode = code;
   res.setHeader('content-type', `${type}; charset=utf-8`);
@@ -109,7 +137,7 @@ export default function draftTools() {
 
   return {
     name: 'field-guide:draft-tools',
-    // The gate: dev server only, and only when started with --mode drafts.
+    // The gate: dev server only, and only when started by `npm run dev:drafts`.
     apply: (_config, env) => env.command === 'serve' && process.env.DRAFT_MODE === '1',
 
     configResolved(config) {
@@ -127,30 +155,21 @@ export default function draftTools() {
         }
 
         if (url === '/__drafts/toggle' && req.method === 'POST') {
-          let body = '';
-          req.on('data', (c) => {
-            body += c;
-            if (body.length > 4096) req.destroy();
-          });
-          req.on('end', () => {
-            let payload;
-            try {
-              payload = JSON.parse(body);
-            } catch {
-              return send(res, 400, { error: 'expected a JSON body' });
-            }
-            const { collection, id, draft } = payload ?? {};
-            if (typeof draft !== 'boolean') return send(res, 400, { error: 'draft must be a boolean' });
-            const file = resolveFile(root, collection, id);
-            if (!file) return send(res, 404, { error: `no such entry: ${collection}/${id}` });
+          readJson(req, 4096)
+            .then((payload) => {
+              const { collection, id, draft } = payload ?? {};
+              if (typeof draft !== 'boolean') return send(res, 400, { error: 'draft must be a boolean' });
+              const file = resolveFile(root, collection, id);
+              if (!file) return send(res, 404, { error: `no such entry: ${collection}/${id}` });
 
-            const before = fs.readFileSync(file, 'utf-8');
-            const after = setDraft(before, draft);
-            if (after !== before) fs.writeFileSync(file, after, 'utf-8');
-            const rel = path.relative(root, file);
-            console.log(`[drafts] ${draft ? 'drafted' : 'published'} ${rel}`);
-            return send(res, 200, { ok: true, file: rel, draft });
-          });
+              const before = fs.readFileSync(file, 'utf-8');
+              const after = setDraft(before, draft);
+              if (after !== before) fs.writeFileSync(file, after, 'utf-8');
+              const rel = path.relative(root, file);
+              console.log(`[drafts] ${draft ? 'drafted' : 'published'} ${rel}`);
+              return send(res, 200, { ok: true, file: rel, draft });
+            })
+            .catch((e) => send(res, e.status ?? 500, { error: e.message }));
           return;
         }
 
